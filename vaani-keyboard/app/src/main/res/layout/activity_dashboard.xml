@@ -7,20 +7,21 @@
     android:padding="24dp">
 
     <TextView
+        android:id="@+id/tv_greeting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="48dp"
-        android:text="@string/app_name"
-        android:textColor="@color/vaani_accent"
-        android:textSize="28sp"
-        android:fontFamily="sans-serif-medium" />
+        android:textColor="@color/vaani_text"
+        android:textSize="22sp"
+        android:fontFamily="sans-serif-medium"
+        android:contentDescription="Greeting" />
 
     <TextView
         android:id="@+id/tv_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:textColor="@color/vaani_text"
-        android:textSize="16sp" />
+        android:layout_marginTop="12dp"
+        android:textColor="@color/vaani_text_muted"
+        android:textSize="15sp" />
 
 </LinearLayout>
