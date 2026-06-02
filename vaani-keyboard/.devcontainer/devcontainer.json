@@ -1,0 +1,36 @@
+{
+  "name": "Vaani Android",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "17",
+      "installGradle": true
+    },
+    "ghcr.io/devcontainers-contrib/features/android-sdk:1": {
+      "platforms": "android-34",
+      "build-tools": "34.0.0",
+      "accept-license": true
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "JetBrains.kotlin-server",
+        "vscjava.vscode-gradle",
+        "vscjava.vscode-java-pack",
+        "Zignd.android-xml"
+      ]
+    }
+  },
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "16gb",
+    "storage": "64gb"
+  },
+  "containerEnv": {
+    "ANDROID_HOME": "/usr/lib/android-sdk",
+    "ANDROID_SDK_ROOT": "/usr/lib/android-sdk"
+  },
+  "postCreateCommand": "yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses 2>/dev/null; echo 'SDK ready'",
+  "remoteUser": "codespace"
+}
