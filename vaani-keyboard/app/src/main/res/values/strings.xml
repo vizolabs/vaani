@@ -8,4 +8,7 @@
     <string name="greeting_evening">Good Evening</string>
     <string name="dashboard_ready">✓ Vaani is ready. Translating %s → English.</string>
     <string name="welcome_hindi">वाणी में आपका स्वागत है</string>
+    <string name="subtype_hindi">हिन्दी (Hindi)</string>
+    <string name="subtype_marathi">मराठी (Marathi)</string>
+    <string name="subtype_hinglish">Hinglish</string>
 </resources>

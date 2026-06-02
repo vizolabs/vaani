@@ -2,11 +2,15 @@
 <input-method xmlns:android="http://schemas.android.com/apk/res/android"
     android:settingsActivity="com.vaani.keyboard.ui.SettingsActivity">
     <subtype
-        android:label="%s"
+        android:label="@string/subtype_hindi"
         android:subtypeLocale="hi_IN"
-        android:subtypeExtraValue="KeyboardLayoutSet=qwerty" />
+        android:subtypeExtraValue="KeyboardLayoutSet=qwerty,AsciiCapable" />
     <subtype
-        android:label="%s"
+        android:label="@string/subtype_marathi"
         android:subtypeLocale="mr_IN"
-        android:subtypeExtraValue="KeyboardLayoutSet=qwerty" />
+        android:subtypeExtraValue="KeyboardLayoutSet=qwerty,AsciiCapable" />
+    <subtype
+        android:label="@string/subtype_hinglish"
+        android:subtypeLocale="en_IN"
+        android:subtypeExtraValue="KeyboardLayoutSet=qwerty,AsciiCapable" />
 </input-method>
