@@ -1,12 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Brand -->
     <color name="vaani_dark">#16161F</color>
     <color name="vaani_accent">#E8943A</color>
+    <color name="vaani_accent_light">#F0B060</color>
+    <color name="vaani_accent_dim">#D08020</color>
+
+    <!-- Surfaces -->
     <color name="vaani_surface">#1A1A2A</color>
+    <color name="vaani_surface_card">#1E1E2E</color>
+    <color name="vaani_surface_elevated">#242438</color>
     <color name="vaani_light">#F5F0E8</color>
-    <color name="vaani_green">#2ECC71</color>
-    <color name="vaani_red">#E74C3C</color>
+
+    <!-- Text -->
     <color name="vaani_text">#F0ECE4</color>
     <color name="vaani_text_muted">#7A7585</color>
-    <color name="vaani_surface_card">#1E1E2E</color>
+    <color name="vaani_text_dim">#3D3A45</color>
+    <color name="vaani_text_on_accent">#FFFFFF</color>
+
+    <!-- Semantic -->
+    <color name="vaani_green">#2ECC71</color>
+    <color name="vaani_green_dim">#1A7A3E</color>
+    <color name="vaani_red">#E74C3C</color>
+    <color name="vaani_red_dim">#A02020</color>
+    <color name="vaani_blue">#3498DB</color>
+
+    <!-- Keyboard -->
+    <color name="kb_bg">#12121C</color>
+    <color name="kb_key">#2A2A38</color>
+    <color name="kb_key_pressed">#3A3A4A</color>
+    <color name="kb_key_text">#E8E4DC</color>
+    <color name="kb_key_text_muted">#8A8595</color>
+    <color name="kb_preview_bg">#1A1A30</color>
+    <color name="kb_preview_text">#C0B8D0</color>
+    <color name="kb_preview_english">#F0ECE4</color>
+
+    <!-- Accents for keyboard action keys -->
+    <color name="kb_mic_bg">#E8943A</color>
+    <color name="kb_send_bg">#2ECC71</color>
+    <color name="kb_send_text">#FFFFFF</color>
 </resources>
