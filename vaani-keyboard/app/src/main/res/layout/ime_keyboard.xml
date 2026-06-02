@@ -3,13 +3,152 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@color/vaani_dark">
+    android:background="@color/kb_bg"
+    android:paddingHorizontal="@dimen/kb_padding_horizontal"
+    android:paddingBottom="@dimen/kb_padding_bottom">
 
-    <TextView
+    <!-- Preview Bar -->
+    <LinearLayout
+        android:id="@+id/preview_bar"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:gravity="center"
-        android:text="@string/app_name"
-        android:textColor="@color/vaani_text_muted" />
+        android:layout_height="@dimen/kb_preview_height"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:background="@drawable/preview_bar_bg"
+        android:layout_marginBottom="4dp"
+        android:paddingHorizontal="12dp">
+
+        <TextView
+            android:id="@+id/tv_preview_hindi"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:textColor="@color/kb_preview_text"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif"
+            android:ellipsize="end"
+            android:maxLines="1" />
+
+        <TextView
+            android:id="@+id/tv_preview_english"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:textColor="@color/kb_preview_english"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif-medium"
+            android:ellipsize="end"
+            android:maxLines="1" />
+
+    </LinearLayout>
+
+    <!-- Row 1: q w e r t y u i o p backspace -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/kb_key_height"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/kb_key_gap">
+
+        <Button android:id="@+id/key_q" style="@style/Widget.Vaani.Key" android:text="q" />
+        <Button android:id="@+id/key_w" style="@style/Widget.Vaani.Key" android:text="w" />
+        <Button android:id="@+id/key_e" style="@style/Widget.Vaani.Key" android:text="e" />
+        <Button android:id="@+id/key_r" style="@style/Widget.Vaani.Key" android:text="r" />
+        <Button android:id="@+id/key_t" style="@style/Widget.Vaani.Key" android:text="t" />
+        <Button android:id="@+id/key_y" style="@style/Widget.Vaani.Key" android:text="y" />
+        <Button android:id="@+id/key_u" style="@style/Widget.Vaani.Key" android:text="u" />
+        <Button android:id="@+id/key_i" style="@style/Widget.Vaani.Key" android:text="i" />
+        <Button android:id="@+id/key_o" style="@style/Widget.Vaani.Key" android:text="o" />
+        <Button android:id="@+id/key_p" style="@style/Widget.Vaani.Key" android:text="p" />
+        <Button android:id="@+id/key_backspace" style="@style/Widget.Vaani.Key" android:text="⌫" android:layout_weight="1.5" />
+
+    </LinearLayout>
+
+    <!-- Row 2: a s d f g h j k l enter -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/kb_key_height"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/kb_key_gap">
+
+        <Button android:id="@+id/key_a" style="@style/Widget.Vaani.Key" android:text="a" />
+        <Button android:id="@+id/key_s" style="@style/Widget.Vaani.Key" android:text="s" />
+        <Button android:id="@+id/key_d" style="@style/Widget.Vaani.Key" android:text="d" />
+        <Button android:id="@+id/key_f" style="@style/Widget.Vaani.Key" android:text="f" />
+        <Button android:id="@+id/key_g" style="@style/Widget.Vaani.Key" android:text="g" />
+        <Button android:id="@+id/key_h" style="@style/Widget.Vaani.Key" android:text="h" />
+        <Button android:id="@+id/key_j" style="@style/Widget.Vaani.Key" android:text="j" />
+        <Button android:id="@+id/key_k" style="@style/Widget.Vaani.Key" android:text="k" />
+        <Button android:id="@+id/key_l" style="@style/Widget.Vaani.Key" android:text="l" />
+        <Button android:id="@+id/key_enter" style="@style/Widget.Vaani.Key" android:text="↵" android:layout_weight="1.5" />
+
+    </LinearLayout>
+
+    <!-- Row 3: shift z x c v b n m , . / -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/kb_key_height"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/kb_key_gap">
+
+        <Button android:id="@+id/key_shift" style="@style/Widget.Vaani.Key" android:text="⇧" android:layout_weight="1.5" />
+        <Button android:id="@+id/key_z" style="@style/Widget.Vaani.Key" android:text="z" />
+        <Button android:id="@+id/key_x" style="@style/Widget.Vaani.Key" android:text="x" />
+        <Button android:id="@+id/key_c" style="@style/Widget.Vaani.Key" android:text="c" />
+        <Button android:id="@+id/key_v" style="@style/Widget.Vaani.Key" android:text="v" />
+        <Button android:id="@+id/key_b" style="@style/Widget.Vaani.Key" android:text="b" />
+        <Button android:id="@+id/key_n" style="@style/Widget.Vaani.Key" android:text="n" />
+        <Button android:id="@+id/key_m" style="@style/Widget.Vaani.Key" android:text="m" />
+        <Button android:id="@+id/key_comma" style="@style/Widget.Vaani.Key" android:text="," />
+        <Button android:id="@+id/key_dot" style="@style/Widget.Vaani.Key" android:text="." />
+        <Button android:id="@+id/key_slash" style="@style/Widget.Vaani.Key" android:text="/" />
+
+    </LinearLayout>
+
+    <!-- Row 4: ?123 mic space . send -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/kb_key_height"
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/kb_key_gap">
+
+        <Button
+            android:id="@+id/key_symbol"
+            style="@style/Widget.Vaani.Key"
+            android:text="?123"
+            android:layout_weight="1.5" />
+
+        <Button
+            android:id="@+id/key_mic"
+            style="@style/Widget.Vaani.Key"
+            android:text="Mic"
+            android:textColor="@color/vaani_text_on_accent"
+            android:background="@drawable/key_bg_accent"
+            android:layout_weight="2" />
+
+        <Button
+            android:id="@+id/key_space"
+            style="@style/Widget.Vaani.Key"
+            android:text=""
+            android:layout_weight="5" />
+
+        <Button
+            android:id="@+id/key_period"
+            style="@style/Widget.Vaani.Key"
+            android:text="."
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/key_send"
+            style="@style/Widget.Vaani.Key"
+            android:text="Send"
+            android:textColor="@color/kb_send_text"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif-medium"
+            android:background="@drawable/key_bg_send"
+            android:layout_weight="2" />
+
+    </LinearLayout>
 
 </LinearLayout>
