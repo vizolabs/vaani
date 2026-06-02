@@ -1,0 +1,34 @@
+com.vaani.keyboard.app-lifecycle-viewmodel-savedstate-2.6.1-0 /Users/vixux/.gradle/caches/transforms-3/02b2c9570b6fcc5bf1d72e773b5cdc9b/transformed/lifecycle-viewmodel-savedstate-2.6.1/res
+com.vaani.keyboard.app-drawerlayout-1.1.1-1 /Users/vixux/.gradle/caches/transforms-3/0d1ec2e1f4849833dafb49c7d7c27303/transformed/drawerlayout-1.1.1/res
+com.vaani.keyboard.app-activity-1.8.0-2 /Users/vixux/.gradle/caches/transforms-3/247d4c11eb40239130726b110aa72bf2/transformed/activity-1.8.0/res
+com.vaani.keyboard.app-emoji2-1.2.0-3 /Users/vixux/.gradle/caches/transforms-3/2e0b7fff77d05979718b1fda25f00027/transformed/emoji2-1.2.0/res
+com.vaani.keyboard.app-fragment-1.3.6-4 /Users/vixux/.gradle/caches/transforms-3/317a2b0935aaf8b64810e3ad2be50f13/transformed/fragment-1.3.6/res
+com.vaani.keyboard.app-startup-runtime-1.1.1-5 /Users/vixux/.gradle/caches/transforms-3/333c1a4e557fef2930920d19c47b491c/transformed/startup-runtime-1.1.1/res
+com.vaani.keyboard.app-core-1.9.0-6 /Users/vixux/.gradle/caches/transforms-3/3b49fb12dd49867bab7474289f903ba1/transformed/core-1.9.0/res
+com.vaani.keyboard.app-lifecycle-livedata-2.6.1-7 /Users/vixux/.gradle/caches/transforms-3/3bd4e9897e99dee42f8bb8beece301ff/transformed/lifecycle-livedata-2.6.1/res
+com.vaani.keyboard.app-appcompat-1.6.1-8 /Users/vixux/.gradle/caches/transforms-3/4e140babc6667e265ec8a92d02849f30/transformed/appcompat-1.6.1/res
+com.vaani.keyboard.app-core-ktx-1.9.0-9 /Users/vixux/.gradle/caches/transforms-3/54c16f52add5f1063fd00437f9b7f8ab/transformed/core-ktx-1.9.0/res
+com.vaani.keyboard.app-annotation-experimental-1.3.0-10 /Users/vixux/.gradle/caches/transforms-3/5b9dea36befe0bd677ed09ef70003ac8/transformed/annotation-experimental-1.3.0/res
+com.vaani.keyboard.app-cardview-1.0.0-11 /Users/vixux/.gradle/caches/transforms-3/6dee3a615b9fa235848c47a06b93e543/transformed/cardview-1.0.0/res
+com.vaani.keyboard.app-emoji2-views-helper-1.2.0-12 /Users/vixux/.gradle/caches/transforms-3/7353b54973f73d9ef8fa962a554a70e8/transformed/emoji2-views-helper-1.2.0/res
+com.vaani.keyboard.app-transition-1.2.0-13 /Users/vixux/.gradle/caches/transforms-3/7b8e450845e91f9c0a37b82c94814642/transformed/transition-1.2.0/res
+com.vaani.keyboard.app-recyclerview-1.1.0-14 /Users/vixux/.gradle/caches/transforms-3/860dc749df4128db644c2fd6b59aaa30/transformed/recyclerview-1.1.0/res
+com.vaani.keyboard.app-lifecycle-viewmodel-2.6.1-15 /Users/vixux/.gradle/caches/transforms-3/8843591383dd9d388100a0d2bbc2db28/transformed/lifecycle-viewmodel-2.6.1/res
+com.vaani.keyboard.app-material-1.11.0-16 /Users/vixux/.gradle/caches/transforms-3/966dc22dfe88d6aa6a396985f62b8652/transformed/material-1.11.0/res
+com.vaani.keyboard.app-coordinatorlayout-1.1.0-17 /Users/vixux/.gradle/caches/transforms-3/99bdce6fd8441f334a983ff6dcb9f777/transformed/coordinatorlayout-1.1.0/res
+com.vaani.keyboard.app-savedstate-1.2.1-18 /Users/vixux/.gradle/caches/transforms-3/a7fb5ca72463952c68a2044cb59e11ab/transformed/savedstate-1.2.1/res
+com.vaani.keyboard.app-core-runtime-2.2.0-19 /Users/vixux/.gradle/caches/transforms-3/ada6f154fe2abdd73f4d7b03529b67b1/transformed/core-runtime-2.2.0/res
+com.vaani.keyboard.app-lifecycle-livedata-core-2.6.1-20 /Users/vixux/.gradle/caches/transforms-3/b7871823263e404c00bda75e16f81ed0/transformed/lifecycle-livedata-core-2.6.1/res
+com.vaani.keyboard.app-viewpager2-1.0.0-21 /Users/vixux/.gradle/caches/transforms-3/be555bc00b6793abefc4457174c651d6/transformed/viewpager2-1.0.0/res
+com.vaani.keyboard.app-lifecycle-process-2.6.1-22 /Users/vixux/.gradle/caches/transforms-3/c1acbce1f29bd3e9601be0c36d9e1dba/transformed/lifecycle-process-2.6.1/res
+com.vaani.keyboard.app-lifecycle-runtime-2.6.1-23 /Users/vixux/.gradle/caches/transforms-3/c9de69411e58caee687afc6e3216bd46/transformed/lifecycle-runtime-2.6.1/res
+com.vaani.keyboard.app-constraintlayout-2.0.1-24 /Users/vixux/.gradle/caches/transforms-3/ce88bd12a6df0ee36794e6208f9964af/transformed/constraintlayout-2.0.1/res
+com.vaani.keyboard.app-profileinstaller-1.3.0-25 /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/res
+com.vaani.keyboard.app-appcompat-resources-1.6.1-26 /Users/vixux/.gradle/caches/transforms-3/ff671768132b82eb551a29ac68e61ab5/transformed/appcompat-resources-1.6.1/res
+com.vaani.keyboard.app-pngs-27 /Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/build/generated/res/pngs/debug
+com.vaani.keyboard.app-resValues-28 /Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/build/generated/res/resValues/debug
+com.vaani.keyboard.app-packageDebugResources-29 /Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
+com.vaani.keyboard.app-packageDebugResources-30 /Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
+com.vaani.keyboard.app-merged_res-31 /Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/build/intermediates/merged_res/debug
+com.vaani.keyboard.app-debug-32 /Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/debug/res
+com.vaani.keyboard.app-main-33 /Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/res

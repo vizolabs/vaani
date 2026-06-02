@@ -99,7 +99,9 @@ object GrammarEngine {
     private fun fixSubjectVerbAgreement(text: String): String {
         var result = text
         for (rule in subjVerbs) {
-            result = rule[0].replace(result) { rule[1] }
+            val regex = rule[0] as Regex
+            val replacement = rule[1] as String
+            result = regex.replace(result, replacement)
         }
         return result
     }

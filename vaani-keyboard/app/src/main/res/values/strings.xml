@@ -59,4 +59,8 @@
     <string name="voice_error">Voice input error: %s</string>
     <string name="voice_no_speech">No speech detected. Try again.</string>
     <string name="voice_unavailable">Speech recognition not available on this device</string>
+
+    <!-- Keyboard -->
+    <string name="kb_symbol_toggle">12#</string>
+    <string name="kb_abc_toggle">ABC</string>
 </resources>

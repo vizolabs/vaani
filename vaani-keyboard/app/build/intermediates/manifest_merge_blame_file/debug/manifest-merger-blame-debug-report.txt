@@ -1,0 +1,170 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.vaani.keyboard"
+4    android:versionCode="1"
+5    android:versionName="1.0.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="21"
+9        android:targetSdkVersion="34" />
+10
+11    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+11-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:4:5-71
+11-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:4:22-68
+12
+13    <permission
+13-->[androidx.core:core:1.9.0] /Users/vixux/.gradle/caches/transforms-3/3b49fb12dd49867bab7474289f903ba1/transformed/core-1.9.0/AndroidManifest.xml:22:5-24:47
+14        android:name="com.vaani.keyboard.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+14-->[androidx.core:core:1.9.0] /Users/vixux/.gradle/caches/transforms-3/3b49fb12dd49867bab7474289f903ba1/transformed/core-1.9.0/AndroidManifest.xml:23:9-81
+15        android:protectionLevel="signature" />
+15-->[androidx.core:core:1.9.0] /Users/vixux/.gradle/caches/transforms-3/3b49fb12dd49867bab7474289f903ba1/transformed/core-1.9.0/AndroidManifest.xml:24:9-44
+16
+17    <uses-permission android:name="com.vaani.keyboard.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+17-->[androidx.core:core:1.9.0] /Users/vixux/.gradle/caches/transforms-3/3b49fb12dd49867bab7474289f903ba1/transformed/core-1.9.0/AndroidManifest.xml:26:5-97
+17-->[androidx.core:core:1.9.0] /Users/vixux/.gradle/caches/transforms-3/3b49fb12dd49867bab7474289f903ba1/transformed/core-1.9.0/AndroidManifest.xml:26:22-94
+18
+19    <application
+19-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:6:5-46:19
+20        android:name="com.vaani.keyboard.VaaniApp"
+20-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:7:9-33
+21        android:allowBackup="true"
+21-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:8:9-35
+22        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+22-->[androidx.core:core:1.9.0] /Users/vixux/.gradle/caches/transforms-3/3b49fb12dd49867bab7474289f903ba1/transformed/core-1.9.0/AndroidManifest.xml:28:18-86
+23        android:debuggable="true"
+24        android:extractNativeLibs="true"
+25        android:icon="@mipmap/ic_launcher"
+25-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:9:9-43
+26        android:label="@string/app_name"
+26-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:10:9-41
+27        android:supportsRtl="true"
+27-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:11:9-35
+28        android:theme="@style/Theme.Vaani" >
+28-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:12:9-43
+29        <activity
+29-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:14:9-22:20
+30            android:name="com.vaani.keyboard.ui.SplashActivity"
+30-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:15:13-46
+31            android:exported="true"
+31-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:16:13-36
+32            android:theme="@style/Theme.Vaani.Splash" >
+32-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:17:13-54
+33            <intent-filter>
+33-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:18:13-21:29
+34                <action android:name="android.intent.action.MAIN" />
+34-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:19:17-69
+34-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:19:25-66
+35
+36                <category android:name="android.intent.category.LAUNCHER" />
+36-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:20:17-77
+36-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:20:27-74
+37            </intent-filter>
+38        </activity>
+39        <activity
+39-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:24:9-27:63
+40            android:name="com.vaani.keyboard.ui.SetupActivity"
+40-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:25:13-45
+41            android:exported="false"
+41-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:26:13-37
+42            android:parentActivityName="com.vaani.keyboard.ui.SplashActivity" />
+42-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:27:13-60
+43        <activity
+43-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:29:9-32:63
+44            android:name="com.vaani.keyboard.ui.DashboardActivity"
+44-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:30:13-49
+45            android:exported="false"
+45-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:31:13-37
+46            android:parentActivityName="com.vaani.keyboard.ui.SplashActivity" />
+46-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:32:13-60
+47
+48        <service
+48-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:34:9-44:19
+49            android:name="com.vaani.keyboard.ime.VaaniKeyboardService"
+49-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:35:13-53
+50            android:exported="true"
+50-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:36:13-36
+51            android:permission="android.permission.BIND_INPUT_METHOD" >
+51-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:37:13-70
+52            <meta-data
+52-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:38:13-40:53
+53                android:name="android.view.im"
+53-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:39:17-47
+54                android:resource="@xml/vaani_ime" />
+54-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:40:17-50
+55
+56            <intent-filter>
+56-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:41:13-43:29
+57                <action android:name="android.view.InputMethod" />
+57-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:42:17-67
+57-->/Users/vixux/2026 Vizolab FACTORY/Vaani/vaani-keyboard/app/src/main/AndroidManifest.xml:42:25-64
+58            </intent-filter>
+59        </service>
+60
+61        <provider
+61-->[androidx.emoji2:emoji2:1.2.0] /Users/vixux/.gradle/caches/transforms-3/2e0b7fff77d05979718b1fda25f00027/transformed/emoji2-1.2.0/AndroidManifest.xml:24:9-32:20
+62            android:name="androidx.startup.InitializationProvider"
+62-->[androidx.emoji2:emoji2:1.2.0] /Users/vixux/.gradle/caches/transforms-3/2e0b7fff77d05979718b1fda25f00027/transformed/emoji2-1.2.0/AndroidManifest.xml:25:13-67
+63            android:authorities="com.vaani.keyboard.androidx-startup"
+63-->[androidx.emoji2:emoji2:1.2.0] /Users/vixux/.gradle/caches/transforms-3/2e0b7fff77d05979718b1fda25f00027/transformed/emoji2-1.2.0/AndroidManifest.xml:26:13-68
+64            android:exported="false" >
+64-->[androidx.emoji2:emoji2:1.2.0] /Users/vixux/.gradle/caches/transforms-3/2e0b7fff77d05979718b1fda25f00027/transformed/emoji2-1.2.0/AndroidManifest.xml:27:13-37
+65            <meta-data
+65-->[androidx.emoji2:emoji2:1.2.0] /Users/vixux/.gradle/caches/transforms-3/2e0b7fff77d05979718b1fda25f00027/transformed/emoji2-1.2.0/AndroidManifest.xml:29:13-31:52
+66                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+66-->[androidx.emoji2:emoji2:1.2.0] /Users/vixux/.gradle/caches/transforms-3/2e0b7fff77d05979718b1fda25f00027/transformed/emoji2-1.2.0/AndroidManifest.xml:30:17-75
+67                android:value="androidx.startup" />
+67-->[androidx.emoji2:emoji2:1.2.0] /Users/vixux/.gradle/caches/transforms-3/2e0b7fff77d05979718b1fda25f00027/transformed/emoji2-1.2.0/AndroidManifest.xml:31:17-49
+68            <meta-data
+68-->[androidx.lifecycle:lifecycle-process:2.6.1] /Users/vixux/.gradle/caches/transforms-3/c1acbce1f29bd3e9601be0c36d9e1dba/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:29:13-31:52
+69                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+69-->[androidx.lifecycle:lifecycle-process:2.6.1] /Users/vixux/.gradle/caches/transforms-3/c1acbce1f29bd3e9601be0c36d9e1dba/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:30:17-78
+70                android:value="androidx.startup" />
+70-->[androidx.lifecycle:lifecycle-process:2.6.1] /Users/vixux/.gradle/caches/transforms-3/c1acbce1f29bd3e9601be0c36d9e1dba/transformed/lifecycle-process-2.6.1/AndroidManifest.xml:31:17-49
+71            <meta-data
+71-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:29:13-31:52
+72                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+72-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:30:17-85
+73                android:value="androidx.startup" />
+73-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:31:17-49
+74        </provider>
+75
+76        <receiver
+76-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:34:9-52:20
+77            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+77-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:35:13-76
+78            android:directBootAware="false"
+78-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:36:13-44
+79            android:enabled="true"
+79-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:37:13-35
+80            android:exported="true"
+80-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:38:13-36
+81            android:permission="android.permission.DUMP" >
+81-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:39:13-57
+82            <intent-filter>
+82-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:40:13-42:29
+83                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+83-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:17-91
+83-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:25-88
+84            </intent-filter>
+85            <intent-filter>
+85-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:43:13-45:29
+86                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+86-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:17-85
+86-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:25-82
+87            </intent-filter>
+88            <intent-filter>
+88-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:46:13-48:29
+89                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+89-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:17-88
+89-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:25-85
+90            </intent-filter>
+91            <intent-filter>
+91-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:49:13-51:29
+92                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+92-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:17-95
+92-->[androidx.profileinstaller:profileinstaller:1.3.0] /Users/vixux/.gradle/caches/transforms-3/d70bfbd412823106d8a9443620eba11a/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:25-92
+93            </intent-filter>
+94        </receiver>
+95    </application>
+96
+97</manifest>

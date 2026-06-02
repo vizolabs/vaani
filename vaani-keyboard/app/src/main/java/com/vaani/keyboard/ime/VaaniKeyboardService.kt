@@ -1,7 +1,6 @@
 package com.vaani.keyboard.ime
 
 import android.inputmethodservice.InputMethodService
-import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -81,12 +80,9 @@ class VaaniKeyboardService : InputMethodService() {
 
     private fun detectSubtypeLanguage() {
         val locale = try {
-            if (Build.VERSION.SDK_INT >= 25) {
-                currentInputMethodSubtype?.locale
-            } else {
-                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.currentInputMethodSubtype?.locale
-            }
+            @Suppress("DEPRECATION")
+            val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.currentInputMethodSubtype?.locale
         } catch (_: Exception) { null }
 
         when {
