@@ -1,26 +1,19 @@
 package com.vaani.keyboard.ui
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import com.vaani.keyboard.R
-import com.vaani.keyboard.util.Prefs
+import com.vaani.keyboard.nav.Navigator
 
-class SplashActivity : AppCompatActivity() {
-
-    private lateinit var prefs: Prefs
+class SplashActivity : BaseActivity() {
 
     private var navigated = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
-
-        prefs = Prefs(this)
-        prefs.markActive()
 
         findViewById<View>(R.id.splash_logo).alpha = 0f
         findViewById<View>(R.id.splash_logo).animate()
@@ -36,12 +29,11 @@ class SplashActivity : AppCompatActivity() {
     private fun navigateNext() {
         if (navigated) return
         navigated = true
-        val intent = if (prefs.isSetupComplete) {
-            Intent(this, DashboardActivity::class.java)
+        if (prefs.isSetupComplete) {
+            Navigator.toDashboard(this, finishCurrent = false)
         } else {
-            Intent(this, SetupActivity::class.java)
+            Navigator.toSetup(this, finishCurrent = false)
         }
-        startActivity(intent)
-        finish()
+        finishWithTransition()
     }
 }
