@@ -45,8 +45,8 @@ abstract class BaseActivity : AppCompatActivity() {
     protected fun finishWithTransition() {
         finish()
         overridePendingTransition(
-            com.vaani.keyboard.R.anim.fade_in,
-            com.vaani.keyboard.R.anim.fade_out
+                R.anim.fade_in,
+                R.anim.fade_out
         )
     }
 
