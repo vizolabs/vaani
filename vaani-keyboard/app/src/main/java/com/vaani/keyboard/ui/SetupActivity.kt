@@ -7,22 +7,27 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.vaani.keyboard.R
 import com.vaani.keyboard.nav.Navigator
 
 class SetupActivity : BaseActivity() {
 
     private var currentStep = 0
+    private var selectedLanguage = "hi"
     private lateinit var stepContent: FrameLayout
     private lateinit var btnBack: Button
     private lateinit var btnNext: Button
     private lateinit var progressBar: ProgressBar
     private lateinit var stepLabel: TextView
 
-    private val totalSteps = 2
+    private val totalSteps = 5
     private val stepLayouts = listOf(
         R.layout.setup_step_welcome,
         R.layout.setup_step_enable_keyboard,
+        R.layout.setup_step_switch_keyboard,
+        R.layout.setup_step_choose_language,
+        R.layout.setup_step_ready,
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,7 +77,7 @@ class SetupActivity : BaseActivity() {
 
     private fun finishSetup() {
         prefs.isSetupComplete = true
-        prefs.selectedLanguage = "hi"
+        prefs.selectedLanguage = selectedLanguage
         Navigator.toDashboard(this)
     }
 
@@ -90,9 +95,54 @@ class SetupActivity : BaseActivity() {
     }
 
     private fun setupStepListeners() {
-        val openSettings = findViewById<Button>(R.id.btn_open_keyboard_settings)
-        openSettings?.setOnClickListener {
+        val openKeyboardSettings = findViewById<Button>(R.id.btn_open_keyboard_settings)
+        openKeyboardSettings?.setOnClickListener {
             startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
         }
+
+        val openDefaultKeyboard = findViewById<Button>(R.id.btn_open_default_keyboard_settings)
+        openDefaultKeyboard?.setOnClickListener {
+            startActivity(Intent(Settings.ACTION_INPUT_METHOD_SETTINGS))
+        }
+
+        val btnHindi = findViewById<Button>(R.id.btn_lang_hindi)
+        val btnMarathi = findViewById<Button>(R.id.btn_lang_marathi)
+        val btnHinglish = findViewById<Button>(R.id.btn_lang_hinglish)
+
+        if (btnHindi != null) {
+            highlightLang(btnHindi, selectedLanguage == "hi")
+            btnHindi.setOnClickListener {
+                selectedLanguage = "hi"
+                highlightLang(btnHindi, true)
+                highlightLang(btnMarathi, false)
+                highlightLang(btnHinglish, false)
+            }
+        }
+        if (btnMarathi != null) {
+            highlightLang(btnMarathi, selectedLanguage == "mr")
+            btnMarathi.setOnClickListener {
+                selectedLanguage = "mr"
+                highlightLang(btnHindi, false)
+                highlightLang(btnMarathi, true)
+                highlightLang(btnHinglish, false)
+            }
+        }
+        if (btnHinglish != null) {
+            highlightLang(btnHinglish, selectedLanguage == "en")
+            btnHinglish.setOnClickListener {
+                selectedLanguage = "en"
+                highlightLang(btnHindi, false)
+                highlightLang(btnMarathi, false)
+                highlightLang(btnHinglish, true)
+            }
+        }
+    }
+
+    private fun highlightLang(button: Button?, selected: Boolean) {
+        if (button == null) return
+        button.backgroundTintList = ContextCompat.getColorStateList(
+            this,
+            if (selected) R.color.vaani_accent else R.color.vaani_surface_card
+        )
     }
 }
