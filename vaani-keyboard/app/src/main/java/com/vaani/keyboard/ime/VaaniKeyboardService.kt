@@ -4,19 +4,28 @@ import android.inputmethodservice.InputMethodService
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.vaani.keyboard.R
+import com.vaani.keyboard.util.PermissionHelper
+import com.vaani.keyboard.util.SpeechRecognizerHelper
 import com.vaani.keyboard.util.Transliterator
 
 class VaaniKeyboardService : InputMethodService() {
 
     private var isShifted = false
     private var isCaps = false
+    private var showSymbols = false
     private val currentInput = StringBuilder()
     private lateinit var previewHindi: TextView
     private lateinit var previewEnglish: TextView
     private lateinit var shiftKey: Button
-    private lateinit var keyboardView: ViewGroup
+    private lateinit var micKey: Button
+    private lateinit var keyboardContainer: LinearLayout
+    private lateinit var qwertyView: View
+    private lateinit var symbolsView: View
+    private var speechHelper: SpeechRecognizerHelper? = null
 
     private val letterKeyIds = listOf(
         R.id.key_q, R.id.key_w, R.id.key_e, R.id.key_r, R.id.key_t,
@@ -28,15 +37,33 @@ class VaaniKeyboardService : InputMethodService() {
     )
 
     override fun onCreateInputView(): View {
-        keyboardView = layoutInflater.inflate(R.layout.ime_keyboard, null) as ViewGroup
-        previewHindi = keyboardView.findViewById(R.id.tv_preview_hindi)
-        previewEnglish = keyboardView.findViewById(R.id.tv_preview_english)
-        shiftKey = keyboardView.findViewById(R.id.key_shift)
-        setupKeys(keyboardView)
-        return keyboardView
+        keyboardContainer = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
+
+        qwertyView = layoutInflater.inflate(R.layout.ime_keyboard, keyboardContainer, false)
+        symbolsView = layoutInflater.inflate(R.layout.ime_keyboard_symbols, keyboardContainer, false)
+
+        keyboardContainer.addView(qwertyView)
+        keyboardContainer.addView(symbolsView)
+        symbolsView.visibility = View.GONE
+
+        previewHindi = qwertyView.findViewById(R.id.tv_preview_hindi)
+        previewEnglish = qwertyView.findViewById(R.id.tv_preview_english)
+        shiftKey = qwertyView.findViewById(R.id.key_shift)
+        micKey = qwertyView.findViewById(R.id.key_mic)
+
+        setupQwertyKeys(qwertyView)
+        setupSymbolKeys(symbolsView)
+
+        return keyboardContainer
     }
 
-    private fun setupKeys(root: View) {
+    private fun setupQwertyKeys(root: View) {
         setKeyListener(root, R.id.key_q, "q")
         setKeyListener(root, R.id.key_w, "w")
         setKeyListener(root, R.id.key_e, "e")
@@ -69,11 +96,50 @@ class VaaniKeyboardService : InputMethodService() {
         setKeyListener(root, R.id.key_comma, ",")
         setKeyListener(root, R.id.key_dot, ".")
         setKeyListener(root, R.id.key_slash, "/")
-        setKeyListener(root, R.id.key_symbol, "symbol")
+        setKeyListener(root, R.id.key_symbol, "toggle_symbols")
         setKeyListener(root, R.id.key_mic, "mic")
         setKeyListener(root, R.id.key_space, " ")
         setKeyListener(root, R.id.key_period, ".")
         setKeyListener(root, R.id.key_send, "send")
+    }
+
+    private fun setupSymbolKeys(root: View) {
+        setKeyListener(root, R.id.key_1, "1")
+        setKeyListener(root, R.id.key_2, "2")
+        setKeyListener(root, R.id.key_3, "3")
+        setKeyListener(root, R.id.key_4, "4")
+        setKeyListener(root, R.id.key_5, "5")
+        setKeyListener(root, R.id.key_6, "6")
+        setKeyListener(root, R.id.key_7, "7")
+        setKeyListener(root, R.id.key_8, "8")
+        setKeyListener(root, R.id.key_9, "9")
+        setKeyListener(root, R.id.key_0, "0")
+        setKeyListener(root, R.id.key_at, "@")
+        setKeyListener(root, R.id.key_hash, "#")
+        setKeyListener(root, R.id.key_dollar, "$")
+        setKeyListener(root, R.id.key_percent, "%")
+        setKeyListener(root, R.id.key_amp, "&")
+        setKeyListener(root, R.id.key_star, "*")
+        setKeyListener(root, R.id.key_minus, "-")
+        setKeyListener(root, R.id.key_plus, "+")
+        setKeyListener(root, R.id.key_lparen, "(")
+        setKeyListener(root, R.id.key_rparen, ")")
+        setKeyListener(root, R.id.key_lbracket, "[")
+        setKeyListener(root, R.id.key_rbracket, "]")
+        setKeyListener(root, R.id.key_lbrace, "{")
+        setKeyListener(root, R.id.key_rbrace, "}")
+        setKeyListener(root, R.id.key_lt, "<")
+        setKeyListener(root, R.id.key_gt, ">")
+        setKeyListener(root, R.id.key_eq, "=")
+        setKeyListener(root, R.id.key_pipe, "|")
+        setKeyListener(root, R.id.key_tilde, "~")
+        setKeyListener(root, R.id.key_backtick, "`")
+        setKeyListener(root, R.id.key_bksp_sym, "backspace")
+        setKeyListener(root, R.id.key_abc, "toggle_symbols")
+        setKeyListener(root, R.id.key_mic_sym, "mic")
+        setKeyListener(root, R.id.key_space_sym, " ")
+        setKeyListener(root, R.id.key_period_sym, ".")
+        setKeyListener(root, R.id.key_send_sym, "send")
     }
 
     private fun setKeyListener(root: View, id: Int, value: String) {
@@ -90,7 +156,7 @@ class VaaniKeyboardService : InputMethodService() {
             "backspace" -> handleBackspace()
             "enter" -> handleEnter()
             "shift" -> handleShift()
-            "symbol" -> handleSymbol()
+            "toggle_symbols" -> toggleSymbols()
             "mic" -> handleMic()
             "send" -> handleSend()
             " " -> handleSpace()
@@ -103,6 +169,26 @@ class VaaniKeyboardService : InputMethodService() {
             "shift" -> handleCapsLock()
             "backspace" -> { clearAll(); updatePreview() }
             "." -> commitText("...")
+            "mic" -> {
+                if (!PermissionHelper.hasRecordAudio(this)) {
+                    PermissionHelper.openAppSettings(this)
+                }
+            }
+        }
+    }
+
+    private fun toggleSymbols() {
+        showSymbols = !showSymbols
+        if (showSymbols) {
+            qwertyView.visibility = View.GONE
+            symbolsView.visibility = View.VISIBLE
+            micKey = symbolsView.findViewById(R.id.key_mic_sym)
+        } else {
+            symbolsView.visibility = View.GONE
+            qwertyView.visibility = View.VISIBLE
+            micKey = qwertyView.findViewById(R.id.key_mic)
+            updateShiftKeyAppearance()
+            updateKeyLabels()
         }
     }
 
@@ -110,9 +196,7 @@ class VaaniKeyboardService : InputMethodService() {
         val char = if (isShifted || isCaps) c.uppercase() else c
         commitText(char)
         currentInput.append(c)
-
         updatePreview()
-
         if (isShifted && !isCaps) {
             isShifted = false
             updateShiftKeyAppearance()
@@ -154,10 +238,38 @@ class VaaniKeyboardService : InputMethodService() {
         updateKeyLabels()
     }
 
-    private fun handleSymbol() {
-    }
-
     private fun handleMic() {
+        if (!PermissionHelper.hasRecordAudio(this)) {
+            previewHindi.text = getString(R.string.perm_mic_denied_message)
+            previewEnglish.text = ""
+            return
+        }
+        if (!SpeechRecognizerHelper.isAvailable(this)) {
+            previewHindi.text = getString(R.string.voice_unavailable)
+            previewEnglish.text = ""
+            return
+        }
+
+        val language = "hi-IN"
+
+        previewHindi.text = getString(R.string.voice_listening)
+        previewEnglish.text = ""
+
+        speechHelper?.stopListening()
+        speechHelper = SpeechRecognizerHelper(
+            context = this,
+            onResult = { text ->
+                commitText("$text ")
+                currentInput.append("$text ")
+                updatePreview()
+            },
+            onError = { error ->
+                previewHindi.text = getString(R.string.voice_error, error)
+                previewEnglish.text = ""
+                keyboardContainer.postDelayed({ updatePreview() }, 2000)
+            }
+        )
+        speechHelper?.startListening(language)
     }
 
     private fun handleSend() {
@@ -166,8 +278,6 @@ class VaaniKeyboardService : InputMethodService() {
         val ic = currentInputConnection ?: return
 
         val transliterated = Transliterator.transliterate(text)
-        val currentText = ic.getTextBeforeCursor(currentInput.length, 0) ?: return
-
         ic.deleteSurroundingText(currentInput.length, 0)
         ic.commitText(transliterated, 1)
         currentInput.clear()
@@ -184,21 +294,31 @@ class VaaniKeyboardService : InputMethodService() {
         currentInput.clear()
     }
 
+    override fun onFinishInput() {
+        super.onFinishInput()
+        speechHelper?.stopListening()
+        speechHelper = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        speechHelper?.stopListening()
+        speechHelper = null
+    }
+
     private fun updateShiftKeyAppearance() {
-        if (isCaps) {
-            shiftKey.setTextColor(
-                androidx.core.content.ContextCompat.getColor(this, R.color.vaani_accent)
-            )
+        if (!::shiftKey.isInitialized) return
+        val color = if (isCaps) {
+            ContextCompat.getColor(this, R.color.vaani_accent)
         } else {
-            shiftKey.setTextColor(
-                androidx.core.content.ContextCompat.getColor(this, R.color.kb_key_text)
-            )
+            ContextCompat.getColor(this, R.color.kb_key_text)
         }
+        shiftKey.setTextColor(color)
     }
 
     private fun updateKeyLabels() {
         for (id in letterKeyIds) {
-            val btn = keyboardView.findViewById<Button>(id) ?: continue
+            val btn = qwertyView.findViewById<Button>(id) ?: continue
             val original = btn.text.toString()
             btn.text = if (isCaps || isShifted) original.uppercase() else original.lowercase()
         }
@@ -219,4 +339,3 @@ class VaaniKeyboardService : InputMethodService() {
         val translated = Transliterator.transliterate(lastWord)
         previewEnglish.text = "→ $translated"
     }
-}
