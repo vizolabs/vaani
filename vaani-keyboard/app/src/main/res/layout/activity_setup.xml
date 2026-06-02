@@ -16,13 +16,15 @@
         android:fontFamily="sans-serif-medium" />
 
     <TextView
+        android:id="@+id/tv_welcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/app_tagline"
         android:textColor="@color/vaani_text_muted"
         android:textSize="16sp"
-        android:gravity="center" />
+        android:gravity="center"
+        android:contentDescription="Welcome message" />
 
     <Button
         android:id="@+id/btn_finish_setup"

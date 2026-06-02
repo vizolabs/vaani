@@ -2,6 +2,7 @@ package com.vaani.keyboard.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -18,11 +19,18 @@ class SetupActivity : AppCompatActivity() {
 
         prefs = Prefs(this)
 
+        findViewById<TextView>(R.id.tv_welcome).text =
+            getString(R.string.welcome_hindi)
+
         findViewById<Button>(R.id.btn_finish_setup).setOnClickListener {
             prefs.isSetupComplete = true
             prefs.selectedLanguage = "hi"
             startActivity(Intent(this, DashboardActivity::class.java))
             finish()
         }
+    }
+
+    override fun onBackPressed() {
+        moveTaskToBack(true)
     }
 }
