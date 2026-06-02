@@ -27,10 +27,10 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-    protected fun setStatusBarLightIcons(light: Boolean) {
+    protected fun setStatusBarLightIcons(lightIcons: Boolean) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val vis = window.decorView.systemUiVisibility
-            window.decorView.systemUiVisibility = if (light) {
+            window.decorView.systemUiVisibility = if (lightIcons) {
                 vis and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
             } else {
                 vis or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
