@@ -2,6 +2,7 @@ package com.vaani.keyboard.ui
 
 import android.os.Bundle
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.vaani.keyboard.R
 import com.vaani.keyboard.util.PermissionHelper
 import java.util.Calendar
@@ -45,10 +46,10 @@ class DashboardActivity : BaseActivity() {
     }
 
     private fun getColorAccent(): Int {
-        return androidx.core.content.ContextCompat.getColor(this, R.color.vaani_green)
+        return ContextCompat.getColor(this, R.color.vaani_green)
     }
 
     private fun getColorMuted(): Int {
-        return androidx.core.content.ContextCompat.getColor(this, R.color.vaani_accent)
+        return ContextCompat.getColor(this, R.color.vaani_accent)
     }
 }
