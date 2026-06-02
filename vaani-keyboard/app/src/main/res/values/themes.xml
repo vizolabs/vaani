@@ -1,24 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- ─── App Theme ─── -->
     <style name="Theme.Vaani" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">@color/vaani_accent</item>
         <item name="colorPrimaryDark">@color/vaani_dark</item>
         <item name="colorAccent">@color/vaani_accent</item>
+        <item name="colorControlNormal">@color/vaani_text_muted</item>
+        <item name="colorControlActivated">@color/vaani_accent</item>
         <item name="android:windowBackground">@color/vaani_dark</item>
         <item name="android:statusBarColor">@color/vaani_dark</item>
         <item name="android:navigationBarColor">@color/vaani_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
+    <!-- ─── Splash Theme ─── -->
     <style name="Theme.Vaani.Splash" parent="Theme.Vaani">
         <item name="android:windowBackground">@color/vaani_dark</item>
     </style>
 
+    <!-- ─── Keyboard IME Theme ─── -->
     <style name="Theme.Vaani.Keyboard" parent="Theme.AppCompat.DayNight.NoActionBar">
-        <item name="android:windowBackground">@color/vaani_dark</item>
+        <item name="android:windowBackground">@color/kb_bg</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@color/vaani_dark</item>
+        <item name="android:windowShowWallpaper">false</item>
+        <item name="android:windowContentOverlay">@null</item>
     </style>
 
+    <!-- ─── Widget Styles ─── -->
     <style name="Widget.Vaani.Button" parent="Widget.AppCompat.Button">
         <item name="android:backgroundTint">@color/vaani_accent</item>
         <item name="android:textColor">@android:color/white</item>
@@ -33,4 +43,13 @@
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textSize">13sp</item>
     </style>
+
+    <style name="Widget.Vaani.Key" parent="Widget.AppCompat.TextView">
+        <item name="android:background">@drawable/key_bg</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/kb_key_text</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+
 </resources>
