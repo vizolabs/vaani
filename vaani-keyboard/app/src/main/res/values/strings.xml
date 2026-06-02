@@ -35,4 +35,18 @@
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
+
+    <!-- Onboarding Step 3: Switch Default Keyboard -->
+    <string name="setup_switch_title">Set Vaani as Default Keyboard</string>
+    <string name="setup_switch_instructions">To make Vaani your main keyboard:\n\n1. Open your phone\'s Settings\n2. Go to Language &amp; Input\n3. Tap Default Keyboard\n4. Select "Vaani"\n5. Return here and tap Next</string>
+    <string name="setup_switch_open_settings">Open Keyboard Settings</string>
+
+    <!-- Onboarding Step 4: Choose Language -->
+    <string name="setup_language_title">Choose Your Input Language</string>
+    <string name="setup_language_subtitle">Select the language you\'ll type in. Vaani will transliterate and translate it to English.</string>
+
+    <!-- Onboarding Step 5: Ready -->
+    <string name="setup_ready_title">You\'re All Set!</string>
+    <string name="setup_ready_tutorial">Type in Hindi, Marathi, or Hinglish\nVaani transliterates to Devanagari\nthen translates to English</string>
+    <string name="setup_ready_tip">Try the voice input button on the keyboard</string>
 </resources>
