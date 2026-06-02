@@ -1,0 +1,237 @@
+package com.vaani.keyboard.util
+
+object GrammarEngine {
+
+    fun clean(text: String): String {
+        if (text.isBlank()) return text
+
+        var result = text.trim()
+
+        result = normalizeWhitespace(result)
+        result = expandContractions(result)
+        result = fixSubjectVerbAgreement(result)
+        result = fixCommonSwaps(result)
+        result = fixArticles(result)
+        result = fixPrepositions(result)
+        result = fixTenseMismatch(result)
+        result = fixRedundancy(result)
+        result = capitalizeFirst(result)
+        result = fixEndPunctuation(result)
+
+        return result
+    }
+
+    private fun normalizeWhitespace(text: String): String {
+        return text.replace(Regex("\\s+"), " ").trim()
+    }
+
+    private val contractions = mapOf(
+        "gonna" to "going to", "wanna" to "want to", "gotta" to "got to",
+        "kinda" to "kind of", "sorta" to "sort of", "lotsa" to "lots of",
+        "coulda" to "could have", "shoulda" to "should have", "woulda" to "would have",
+        "musta" to "must have", "mighta" to "might have",
+        "u" to "you", "r" to "are", "ur" to "your", "urs" to "yours",
+        "urself" to "yourself", "pls" to "please", "plz" to "please",
+        "thx" to "thanks", "thanx" to "thanks", "ty" to "thank you",
+        "btw" to "by the way", "idk" to "I don't know", "imo" to "in my opinion",
+        "imho" to "in my humble opinion", "lol" to "haha", "brb" to "be right back",
+        "gtg" to "got to go", "ttyl" to "talk to you later", "omw" to "on my way",
+        "nvm" to "never mind", "atm" to "at the moment", "asap" to "as soon as possible",
+        "afaik" to "as far as I know", "ikr" to "I know, right",
+        "rn" to "right now", "dm" to "direct message",
+        "msg" to "message", "pic" to "picture", "pics" to "pictures",
+        "cud" to "could", "shud" to "should", "wud" to "would",
+    )
+
+    private fun expandContractions(text: String): String {
+        var result = text
+        for ((shortForm, longForm) in contractions) {
+            result = result.replace(Regex("\\b$shortForm\\b", RegexOption.IGNORE_CASE)) {
+                if (it.value[0].isUpperCase()) longForm.replaceFirstChar { c -> c.uppercase() }
+                else longForm
+            }
+        }
+        return result
+    }
+
+    private val subjVerbs = arrayOf(
+        arrayOf(Regex("\\bhe don't\\b", RegexOption.IGNORE_CASE), "he doesn't"),
+        arrayOf(Regex("\\bshe don't\\b", RegexOption.IGNORE_CASE), "she doesn't"),
+        arrayOf(Regex("\\bit don't\\b", RegexOption.IGNORE_CASE), "it doesn't"),
+        arrayOf(Regex("\\bhe doesn't\\b", RegexOption.IGNORE_CASE), "he doesn't"),
+
+        arrayOf(Regex("\\bhe go\\b", RegexOption.IGNORE_CASE), "he goes"),
+        arrayOf(Regex("\\bshe go\\b", RegexOption.IGNORE_CASE), "she goes"),
+        arrayOf(Regex("\\bit go\\b", RegexOption.IGNORE_CASE), "it goes"),
+
+        arrayOf(Regex("\\bhe have\\b", RegexOption.IGNORE_CASE), "he has"),
+        arrayOf(Regex("\\bshe have\\b", RegexOption.IGNORE_CASE), "she has"),
+        arrayOf(Regex("\\bit have\\b", RegexOption.IGNORE_CASE), "it has"),
+
+        arrayOf(Regex("\\bhe do\\b", RegexOption.IGNORE_CASE), "he does"),
+        arrayOf(Regex("\\bshe do\\b", RegexOption.IGNORE_CASE), "she does"),
+        arrayOf(Regex("\\bit do\\b", RegexOption.IGNORE_CASE), "it does"),
+
+        arrayOf(Regex("\\bthey goes\\b", RegexOption.IGNORE_CASE), "they go"),
+        arrayOf(Regex("\\bwe goes\\b", RegexOption.IGNORE_CASE), "we go"),
+        arrayOf(Regex("\\byou goes\\b", RegexOption.IGNORE_CASE), "you go"),
+
+        arrayOf(Regex("\\bthey has\\b", RegexOption.IGNORE_CASE), "they have"),
+        arrayOf(Regex("\\bwe has\\b", RegexOption.IGNORE_CASE), "we have"),
+        arrayOf(Regex("\\byou has\\b", RegexOption.IGNORE_CASE), "you have"),
+
+        arrayOf(Regex("\\bthey does\\b", RegexOption.IGNORE_CASE), "they do"),
+        arrayOf(Regex("\\bwe does\\b", RegexOption.IGNORE_CASE), "we do"),
+        arrayOf(Regex("\\byou does\\b", RegexOption.IGNORE_CASE), "you do"),
+
+        arrayOf(Regex("\\bi is\\b", RegexOption.IGNORE_CASE), "I am"),
+        arrayOf(Regex("\\bi are\\b", RegexOption.IGNORE_CASE), "I am"),
+        arrayOf(Regex("\\bi was\\b", RegexOption.IGNORE_CASE), "I was"),
+
+        arrayOf(Regex("\\bhe are\\b", RegexOption.IGNORE_CASE), "he is"),
+        arrayOf(Regex("\\bshe are\\b", RegexOption.IGNORE_CASE), "she is"),
+        arrayOf(Regex("\\bit are\\b", RegexOption.IGNORE_CASE), "it is"),
+
+        arrayOf(Regex("\\bthey is\\b", RegexOption.IGNORE_CASE), "they are"),
+        arrayOf(Regex("\\bwe is\\b", RegexOption.IGNORE_CASE), "we are"),
+    )
+
+    private fun fixSubjectVerbAgreement(text: String): String {
+        var result = text
+        for (rule in subjVerbs) {
+            result = rule[0].replace(result) { rule[1] }
+        }
+        return result
+    }
+
+    private val commonSwaps = arrayOf(
+        "adviced" to "advised",
+        "acheive" to "achieve", "acheived" to "achieved", "acheiving" to "achieving",
+        "beleive" to "believe", "beleived" to "believed", "beleiving" to "believing",
+        "calender" to "calendar",
+        "definately" to "definitely", "definately" to "definitely",
+        "dissapoint" to "disappoint", "dissapointed" to "disappointed",
+        "embarass" to "embarrass", "embarassed" to "embarrassed",
+        "famoust" to "famous",
+        "goverment" to "government",
+        "grammer" to "grammar",
+        "happenn" to "happen", "happenned" to "happened", "happening" to "happening",
+        "immediatly" to "immediately",
+        "jewellery" to "jewelry",
+        "knowlege" to "knowledge",
+        "langauge" to "language",
+        "millon" to "million", "millons" to "millions",
+        "neccessary" to "necessary",
+        "occassion" to "occasion", "occassional" to "occasional",
+        "parlament" to "parliament",
+        "recieve" to "receive", "recieved" to "received", "recieving" to "receiving",
+        "seperate" to "separate",
+        "suprise" to "surprise",
+        "tommorow" to "tomorrow", "tommorrow" to "tomorrow", "tomorow" to "tomorrow",
+        "untill" to "until",
+        "vaccume" to "vacuum",
+        "wensday" to "Wednesday",
+        "prefered" to "preferred", "refered" to "referred",
+        "occured" to "occurred", "occuring" to "occurring",
+        "sign up" to "signup", "log in" to "login", "set up" to "setup",
+    )
+
+    private fun fixCommonSwaps(text: String): String {
+        var result = text
+        for ((wrong, right) in commonSwaps) {
+            result = result.replace(Regex("\\b$wrong\\b", RegexOption.IGNORE_CASE)) {
+                if (it.value[0].isUpperCase()) right.replaceFirstChar { c -> c.uppercase() }
+                else right
+            }
+        }
+        return result
+    }
+
+    private fun fixArticles(text: String): String {
+        var result = text
+
+        result = result.replace(Regex("\\ba\\b\\s+(?=[aeiouAEIOU])")) { "an " }
+
+        result = result.replace("a an ", "an ")
+
+        result = result.replace(Regex("\\bthe my\\b", RegexOption.IGNORE_CASE)) { "my" }
+        result = result.replace(Regex("\\bthe your\\b", RegexOption.IGNORE_CASE)) { "your" }
+        result = result.replace(Regex("\\bthe his\\b", RegexOption.IGNORE_CASE)) { "his" }
+        result = result.replace(Regex("\\bthe her\\b", RegexOption.IGNORE_CASE)) { "her" }
+        result = result.replace(Regex("\\bthe our\\b", RegexOption.IGNORE_CASE)) { "our" }
+        result = result.replace(Regex("\\bthe their\\b", RegexOption.IGNORE_CASE)) { "their" }
+
+        return result
+    }
+
+    private fun fixPrepositions(text: String): String {
+        var result = text
+
+        result = result.replace(Regex("\\bcoupleds of\\b", RegexOption.IGNORE_CASE)) { "couple of" }
+        result = result.replace(Regex("\\bmore better\\b", RegexOption.IGNORE_CASE)) { "better" }
+        result = result.replace(Regex("\\bmore bigger\\b", RegexOption.IGNORE_CASE)) { "bigger" }
+        result = result.replace(Regex("\\bmore smaller\\b", RegexOption.IGNORE_CASE)) { "smaller" }
+
+        return result
+    }
+
+    private fun fixTenseMismatch(text: String): String {
+        var result = text
+
+        result = result.replace(Regex("\\bI am having\\b", RegexOption.IGNORE_CASE)) { match ->
+            if (match.value.matches(Regex(".*\\bhaving\\b.*(\\bcar\\b|\\bbike\\b|\\bhouse\\b|\\bphone\\b|\\blaptop\\b|\\bcomputer\\b|\\bTV\\b|\\btv\\b|\\bbook\\b|\\bpen\\b|\\bbag\\b|\\bwatch\\b)")))
+                "I have"
+            else match.value
+        }
+
+        result = result.replace(Regex("\\bhave you ate\\b", RegexOption.IGNORE_CASE)) { "have you eaten" }
+        result = result.replace(Regex("\\bdid you ate\\b", RegexOption.IGNORE_CASE)) { "did you eat" }
+        result = result.replace(Regex("\\bdid you went\\b", RegexOption.IGNORE_CASE)) { "did you go" }
+        result = result.replace(Regex("\\bdid you did\\b", RegexOption.IGNORE_CASE)) { "did you do" }
+        result = result.replace(Regex("\\bdid you came\\b", RegexOption.IGNORE_CASE)) { "did you come" }
+        result = result.replace(Regex("\\bdid you took\\b", RegexOption.IGNORE_CASE)) { "did you take" }
+        result = result.replace(Regex("\\bdid you gave\\b", RegexOption.IGNORE_CASE)) { "did you give" }
+
+        result = result.replace(Regex("\\bI have been completed\\b", RegexOption.IGNORE_CASE)) { "I have completed" }
+        result = result.replace(Regex("\\bI have been finished\\b", RegexOption.IGNORE_CASE)) { "I have finished" }
+
+        result = result.replace(Regex("\\bI am (?:not )?come\\b", RegexOption.IGNORE_CASE)) { "I have come" }
+        result = result.replace(Regex("\\bI am (?:not )?went\\b", RegexOption.IGNORE_CASE)) { "I went" }
+        result = result.replace(Regex("\\b(?:He|She) is come\\b", RegexOption.IGNORE_CASE)) { "has come" }
+        result = result.replace(Regex("\\b(?:He|She) is went\\b", RegexOption.IGNORE_CASE)) { "went" }
+
+        return result
+    }
+
+    private fun fixRedundancy(text: String): String {
+        var result = text
+
+        result = result.replace(Regex("\\brevert back\\b", RegexOption.IGNORE_CASE)) { "revert" }
+        result = result.replace(Regex("\\breturn back\\b", RegexOption.IGNORE_CASE)) { "return" }
+        result = result.replace(Regex("\\brepeat again\\b", RegexOption.IGNORE_CASE)) { "repeat" }
+        result = result.replace(Regex("\\breply back\\b", RegexOption.IGNORE_CASE)) { "reply" }
+        result = result.replace(Regex("\\bATM machine\\b", RegexOption.IGNORE_CASE)) { "ATM" }
+        result = result.replace(Regex("\\bPIN number\\b", RegexOption.IGNORE_CASE)) { "PIN" }
+        result = result.replace(Regex("\\bISBN number\\b", RegexOption.IGNORE_CASE)) { "ISBN" }
+
+        return result
+    }
+
+    private fun capitalizeFirst(text: String): String {
+        if (text.isEmpty()) return text
+        return text[0].uppercase() + text.substring(1)
+    }
+
+    private fun fixEndPunctuation(text: String): String {
+        val trimmed = text.trimEnd()
+        if (trimmed.isEmpty()) return text
+
+        val last = trimmed.last()
+        if (last in listOf('.', '!', '?', ':', ';')) return trimmed
+
+        if (trimmed.endsWith("...")) return trimmed
+
+        if (trimmed.length > 10) return "$trimmed."
+        return trimmed
+    }
+}
