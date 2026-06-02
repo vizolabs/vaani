@@ -13,3 +13,8 @@ local.properties
 *.aab
 .DS_Store?
 
+# Build outputs at any depth
+app/build/
+build/reports/
+build/tmp/
+
