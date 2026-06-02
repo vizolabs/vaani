@@ -30,10 +30,9 @@ class SplashActivity : BaseActivity() {
         if (navigated) return
         navigated = true
         if (prefs.isSetupComplete) {
-            Navigator.toDashboard(this, finishCurrent = false)
+            Navigator.toDashboard(this)
         } else {
-            Navigator.toSetup(this, finishCurrent = false)
+            Navigator.toSetup(this)
         }
-        finishWithTransition()
     }
 }
