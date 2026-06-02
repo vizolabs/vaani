@@ -23,4 +23,15 @@
     <dimen name="radius_small">6dp</dimen>
     <dimen name="radius_medium">10dp</dimen>
     <dimen name="radius_large">16dp</dimen>
+
+    <!-- Preview bar -->
+    <dimen name="preview_bar_height">48dp</dimen>
+    <dimen name="preview_bar_margin_h">4dp</dimen>
+    <dimen name="preview_bar_margin_b">4dp</dimen>
+    <dimen name="preview_bar_text_size">12sp</dimen>
+    <dimen name="preview_bar_english_size">14sp</dimen>
+
+    <!-- Voice mic button -->
+    <dimen name="mic_button_size">48dp</dimen>
+    <dimen name="mic_icon_size">24dp</dimen>
 </resources>
