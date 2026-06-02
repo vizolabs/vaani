@@ -2,4 +2,7 @@
 <resources>
     <string name="app_name">Vaani</string>
     <string name="app_tagline">Speak Your Language. We Write English.</string>
+    <string name="btn_get_started">Get Started</string>
+    <string name="dashboard_ready">✓ Vaani is ready. Translating %s → English.</string>
+    <string name="welcome_hindi">वाणी में आपका स्वागत है</string>
 </resources>
