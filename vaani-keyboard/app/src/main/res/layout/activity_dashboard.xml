@@ -33,4 +33,18 @@
         android:clickable="true"
         android:focusable="true" />
 
+    <TextView
+        android:id="@+id/tv_settings_link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="10dp"
+        android:text="@string/settings_title"
+        android:textColor="@color/vaani_text_muted"
+        android:textSize="13sp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@drawable/chip_bg" />
+
 </LinearLayout>
