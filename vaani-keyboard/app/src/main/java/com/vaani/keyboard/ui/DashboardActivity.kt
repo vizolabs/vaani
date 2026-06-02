@@ -2,21 +2,14 @@ package com.vaani.keyboard.ui
 
 import android.os.Bundle
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import com.vaani.keyboard.R
-import com.vaani.keyboard.util.Prefs
 import java.util.Calendar
 
-class DashboardActivity : AppCompatActivity() {
-
-    private lateinit var prefs: Prefs
+class DashboardActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
-
-        prefs = Prefs(this)
-        prefs.markActive()
 
         val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         val greeting = when {
