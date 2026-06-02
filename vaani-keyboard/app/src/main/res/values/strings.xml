@@ -32,4 +32,7 @@
     <string name="setup_enable_instructions">To use Vaani for typing:\n\n1. Open your phone\'s Settings\n2. Go to Language &amp; Input\n3. Select Keyboards / On-screen keyboard\n4. Enable "Vaani"\n5. Return here and tap Next</string>
     <string name="setup_enable_open_settings">Open Keyboard Settings</string>
     <string name="setup_enable_return_hint">Return to this screen after enabling</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
 </resources>
