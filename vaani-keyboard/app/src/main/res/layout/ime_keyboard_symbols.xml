@@ -7,6 +7,48 @@
     android:paddingHorizontal="@dimen/kb_padding_horizontal"
     android:paddingBottom="@dimen/kb_padding_bottom">
 
+    <!-- Suggestion Bar -->
+    <LinearLayout
+        android:id="@+id/suggestion_bar_sym"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/suggestion_bar_height"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="@dimen/suggestion_bar_gap"
+        android:paddingHorizontal="4dp">
+
+        <TextView
+            android:id="@+id/suggestion_sym_1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="@color/kb_preview_english"
+            android:textSize="@dimen/suggestion_text_size"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/suggestion_sym_2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="@color/kb_preview_english"
+            android:textSize="@dimen/suggestion_text_size"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/suggestion_sym_3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="@color/kb_preview_english"
+            android:textSize="@dimen/suggestion_text_size"
+            android:visibility="invisible" />
+
+    </LinearLayout>
+
     <!-- Row 1: 1 2 3 4 5 6 7 8 9 0 -->
     <LinearLayout
         android:layout_width="match_parent"
