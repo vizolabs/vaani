@@ -8,7 +8,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.vaani.keyboard.R
+import com.vaani.keyboard.util.AutoCompleteHelper
+import com.vaani.keyboard.util.GrammarEngine
 import com.vaani.keyboard.util.PermissionHelper
+import com.vaani.keyboard.util.Prefs
 import com.vaani.keyboard.util.SpeechRecognizerHelper
 import com.vaani.keyboard.util.Transliterator
 
@@ -18,6 +21,7 @@ class VaaniKeyboardService : InputMethodService() {
     private var isCaps = false
     private var showSymbols = false
     private val currentInput = StringBuilder()
+    private lateinit var prefs: Prefs
     private lateinit var previewHindi: TextView
     private lateinit var previewEnglish: TextView
     private lateinit var shiftKey: Button
@@ -35,6 +39,37 @@ class VaaniKeyboardService : InputMethodService() {
         R.id.key_z, R.id.key_x, R.id.key_c, R.id.key_v, R.id.key_b,
         R.id.key_n, R.id.key_m
     )
+
+    private val altChars = mapOf(
+        "a" to "áàâäãåæā",
+        "e" to "éèêëēėę",
+        "i" to "íìîïīį",
+        "o" to "óòôöõøōœ",
+        "u" to "úùûüū",
+        "n" to "ñńņň",
+        "s" to "ßśšṣ",
+        "c" to "çćčċ",
+        "z" to "žźż",
+        "1" to "!¹½⅓",
+        "2" to "@²⅔",
+        "3" to "#³¾",
+        "4" to "$¼¤",
+        "5" to "%½‰",
+        "6" to "^¬⅙",
+        "7" to "&⅛⅜",
+        "8" to "*⅝⅞",
+        "9" to "(⅘",
+        "0" to ")°‰",
+        "-" to "_–—•",
+        "+" to "±÷×=",
+        "." to ",…•",
+        "/" to "\\",
+    )
+
+    override fun onCreate() {
+        super.onCreate()
+        prefs = Prefs(this)
+    }
 
     override fun onCreateInputView(): View {
         keyboardContainer = LinearLayout(this).apply {
@@ -57,45 +92,91 @@ class VaaniKeyboardService : InputMethodService() {
         shiftKey = qwertyView.findViewById(R.id.key_shift)
         micKey = qwertyView.findViewById(R.id.key_mic)
 
+        setupSuggestionClicks(qwertyView, R.id.suggestion_1, R.id.suggestion_2, R.id.suggestion_3)
+        setupSuggestionClicks(symbolsView, R.id.suggestion_sym_1, R.id.suggestion_sym_2, R.id.suggestion_sym_3)
+
         setupQwertyKeys(qwertyView)
         setupSymbolKeys(symbolsView)
 
         return keyboardContainer
     }
 
+    private fun setupSuggestionClicks(root: View, id1: Int, id2: Int, id3: Int) {
+        root.findViewById<TextView>(id1)?.setOnClickListener { commitSuggestion(0) }
+        root.findViewById<TextView>(id2)?.setOnClickListener { commitSuggestion(1) }
+        root.findViewById<TextView>(id3)?.setOnClickListener { commitSuggestion(2) }
+    }
+
+    private var lastSuggestions: List<String> = emptyList()
+
+    private fun commitSuggestion(index: Int) {
+        if (index >= lastSuggestions.size) return
+        val word = lastSuggestions[index]
+
+        val ic = currentInputConnection ?: return
+        val text = currentInput.toString()
+        val lastSpace = text.lastIndexOf(' ')
+        val prefixLen = if (lastSpace >= 0) text.length - lastSpace - 1 else text.length
+        ic.deleteSurroundingText(prefixLen, 0)
+        if (lastSpace >= 0) {
+            currentInput.delete(currentInput.length - prefixLen, currentInput.length)
+            currentInput.append(word)
+        } else {
+            currentInput.clear()
+            currentInput.append(word)
+        }
+        currentInput.append(" ")
+        commitText("$word ")
+        updatePreview()
+    }
+
+    private fun updateSuggestions() {
+        val text = currentInput.toString()
+        val lastWord = text.split(" ").lastOrNull { it.isNotBlank() } ?: ""
+
+        val suggestions = if (lastWord.length >= 2) {
+            AutoCompleteHelper.suggestions(lastWord, 3)
+        } else {
+            emptyList()
+        }
+
+        lastSuggestions = suggestions
+        val qwertySuggestions = listOf(
+            qwertyView.findViewById<TextView>(R.id.suggestion_1),
+            qwertyView.findViewById<TextView>(R.id.suggestion_2),
+            qwertyView.findViewById<TextView>(R.id.suggestion_3),
+        )
+        val symSuggestions = listOf(
+            symbolsView.findViewById<TextView>(R.id.suggestion_sym_1),
+            symbolsView.findViewById<TextView>(R.id.suggestion_sym_2),
+            symbolsView.findViewById<TextView>(R.id.suggestion_sym_3),
+        )
+
+        for (i in 0 until 3) {
+            val text = suggestions.getOrNull(i) ?: ""
+            qwertySuggestions[i].apply { this.text = text; visibility = if (text.isEmpty()) View.INVISIBLE else View.VISIBLE }
+            symSuggestions[i].apply { this.text = text; visibility = if (text.isEmpty()) View.INVISIBLE else View.VISIBLE }
+        }
+    }
+
     private fun setupQwertyKeys(root: View) {
-        setKeyListener(root, R.id.key_q, "q")
-        setKeyListener(root, R.id.key_w, "w")
-        setKeyListener(root, R.id.key_e, "e")
-        setKeyListener(root, R.id.key_r, "r")
-        setKeyListener(root, R.id.key_t, "t")
-        setKeyListener(root, R.id.key_y, "y")
-        setKeyListener(root, R.id.key_u, "u")
-        setKeyListener(root, R.id.key_i, "i")
-        setKeyListener(root, R.id.key_o, "o")
-        setKeyListener(root, R.id.key_p, "p")
+        setKeyListener(root, R.id.key_q, "q"); setKeyListener(root, R.id.key_w, "w")
+        setKeyListener(root, R.id.key_e, "e"); setKeyListener(root, R.id.key_r, "r")
+        setKeyListener(root, R.id.key_t, "t"); setKeyListener(root, R.id.key_y, "y")
+        setKeyListener(root, R.id.key_u, "u"); setKeyListener(root, R.id.key_i, "i")
+        setKeyListener(root, R.id.key_o, "o"); setKeyListener(root, R.id.key_p, "p")
         setKeyListener(root, R.id.key_backspace, "backspace")
-        setKeyListener(root, R.id.key_a, "a")
-        setKeyListener(root, R.id.key_s, "s")
-        setKeyListener(root, R.id.key_d, "d")
-        setKeyListener(root, R.id.key_f, "f")
-        setKeyListener(root, R.id.key_g, "g")
-        setKeyListener(root, R.id.key_h, "h")
-        setKeyListener(root, R.id.key_j, "j")
-        setKeyListener(root, R.id.key_k, "k")
-        setKeyListener(root, R.id.key_l, "l")
-        setKeyListener(root, R.id.key_enter, "enter")
+        setKeyListener(root, R.id.key_a, "a"); setKeyListener(root, R.id.key_s, "s")
+        setKeyListener(root, R.id.key_d, "d"); setKeyListener(root, R.id.key_f, "f")
+        setKeyListener(root, R.id.key_g, "g"); setKeyListener(root, R.id.key_h, "h")
+        setKeyListener(root, R.id.key_j, "j"); setKeyListener(root, R.id.key_k, "k")
+        setKeyListener(root, R.id.key_l, "l"); setKeyListener(root, R.id.key_enter, "enter")
         setKeyListener(root, R.id.key_shift, "shift")
-        setKeyListener(root, R.id.key_z, "z")
-        setKeyListener(root, R.id.key_x, "x")
-        setKeyListener(root, R.id.key_c, "c")
-        setKeyListener(root, R.id.key_v, "v")
-        setKeyListener(root, R.id.key_b, "b")
-        setKeyListener(root, R.id.key_n, "n")
-        setKeyListener(root, R.id.key_m, "m")
-        setKeyListener(root, R.id.key_comma, ",")
-        setKeyListener(root, R.id.key_dot, ".")
-        setKeyListener(root, R.id.key_slash, "/")
+        setKeyListener(root, R.id.key_z, "z"); setKeyListener(root, R.id.key_x, "x")
+        setKeyListener(root, R.id.key_c, "c"); setKeyListener(root, R.id.key_v, "v")
+        setKeyListener(root, R.id.key_b, "b"); setKeyListener(root, R.id.key_n, "n")
+        setKeyListener(root, R.id.key_m, "m"); setKeyListener(root, R.id.key_comma, ",")
+        setKeyListener(root, R.id.key_dot, "."); setKeyListener(root, R.id.key_slash, "/")
         setKeyListener(root, R.id.key_symbol, "toggle_symbols")
         setKeyListener(root, R.id.key_mic, "mic")
         setKeyListener(root, R.id.key_space, " ")
@@ -104,36 +185,21 @@ class VaaniKeyboardService : InputMethodService() {
     }
 
     private fun setupSymbolKeys(root: View) {
-        setKeyListener(root, R.id.key_1, "1")
-        setKeyListener(root, R.id.key_2, "2")
-        setKeyListener(root, R.id.key_3, "3")
-        setKeyListener(root, R.id.key_4, "4")
-        setKeyListener(root, R.id.key_5, "5")
-        setKeyListener(root, R.id.key_6, "6")
-        setKeyListener(root, R.id.key_7, "7")
-        setKeyListener(root, R.id.key_8, "8")
-        setKeyListener(root, R.id.key_9, "9")
-        setKeyListener(root, R.id.key_0, "0")
-        setKeyListener(root, R.id.key_at, "@")
-        setKeyListener(root, R.id.key_hash, "#")
-        setKeyListener(root, R.id.key_dollar, "$")
-        setKeyListener(root, R.id.key_percent, "%")
-        setKeyListener(root, R.id.key_amp, "&")
-        setKeyListener(root, R.id.key_star, "*")
-        setKeyListener(root, R.id.key_minus, "-")
-        setKeyListener(root, R.id.key_plus, "+")
-        setKeyListener(root, R.id.key_lparen, "(")
-        setKeyListener(root, R.id.key_rparen, ")")
-        setKeyListener(root, R.id.key_lbracket, "[")
-        setKeyListener(root, R.id.key_rbracket, "]")
-        setKeyListener(root, R.id.key_lbrace, "{")
-        setKeyListener(root, R.id.key_rbrace, "}")
-        setKeyListener(root, R.id.key_lt, "<")
-        setKeyListener(root, R.id.key_gt, ">")
-        setKeyListener(root, R.id.key_eq, "=")
-        setKeyListener(root, R.id.key_pipe, "|")
-        setKeyListener(root, R.id.key_tilde, "~")
-        setKeyListener(root, R.id.key_backtick, "`")
+        setKeyListener(root, R.id.key_1, "1"); setKeyListener(root, R.id.key_2, "2")
+        setKeyListener(root, R.id.key_3, "3"); setKeyListener(root, R.id.key_4, "4")
+        setKeyListener(root, R.id.key_5, "5"); setKeyListener(root, R.id.key_6, "6")
+        setKeyListener(root, R.id.key_7, "7"); setKeyListener(root, R.id.key_8, "8")
+        setKeyListener(root, R.id.key_9, "9"); setKeyListener(root, R.id.key_0, "0")
+        setKeyListener(root, R.id.key_at, "@"); setKeyListener(root, R.id.key_hash, "#")
+        setKeyListener(root, R.id.key_dollar, "$"); setKeyListener(root, R.id.key_percent, "%")
+        setKeyListener(root, R.id.key_amp, "&"); setKeyListener(root, R.id.key_star, "*")
+        setKeyListener(root, R.id.key_minus, "-"); setKeyListener(root, R.id.key_plus, "+")
+        setKeyListener(root, R.id.key_lparen, "("); setKeyListener(root, R.id.key_rparen, ")")
+        setKeyListener(root, R.id.key_lbracket, "["); setKeyListener(root, R.id.key_rbracket, "]")
+        setKeyListener(root, R.id.key_lbrace, "{"); setKeyListener(root, R.id.key_rbrace, "}")
+        setKeyListener(root, R.id.key_lt, "<"); setKeyListener(root, R.id.key_gt, ">")
+        setKeyListener(root, R.id.key_eq, "="); setKeyListener(root, R.id.key_pipe, "|")
+        setKeyListener(root, R.id.key_tilde, "~"); setKeyListener(root, R.id.key_backtick, "`")
         setKeyListener(root, R.id.key_bksp_sym, "backspace")
         setKeyListener(root, R.id.key_abc, "toggle_symbols")
         setKeyListener(root, R.id.key_mic_sym, "mic")
@@ -172,6 +238,14 @@ class VaaniKeyboardService : InputMethodService() {
             "mic" -> {
                 if (!PermissionHelper.hasRecordAudio(this)) {
                     PermissionHelper.openAppSettings(this)
+                }
+            }
+            else -> {
+                val alt = altChars[value]
+                if (alt != null && alt.isNotEmpty()) {
+                    commitText(alt.first().toString())
+                    currentInput.append(alt.first())
+                    updatePreview()
                 }
             }
         }
@@ -250,7 +324,11 @@ class VaaniKeyboardService : InputMethodService() {
             return
         }
 
-        val language = "hi-IN"
+        val lang = when (prefs.selectedLanguage) {
+            "hi" -> "hi-IN"
+            "mr" -> "mr-IN"
+            else -> "hi-IN"
+        }
 
         previewHindi.text = getString(R.string.voice_listening)
         previewEnglish.text = ""
@@ -269,15 +347,17 @@ class VaaniKeyboardService : InputMethodService() {
                 keyboardContainer.postDelayed({ updatePreview() }, 2000)
             }
         )
-        speechHelper?.startListening(language)
+        speechHelper?.startListening(lang)
     }
 
     private fun handleSend() {
-        val text = currentInput.toString().trim()
-        if (text.isEmpty()) return
+        val rawText = currentInput.toString().trim()
+        if (rawText.isEmpty()) return
         val ic = currentInputConnection ?: return
 
-        val transliterated = Transliterator.transliterate(text)
+        val cleaned = GrammarEngine.clean(rawText)
+        val transliterated = Transliterator.transliterate(cleaned)
+
         ic.deleteSurroundingText(currentInput.length, 0)
         ic.commitText(transliterated, 1)
         currentInput.clear()
@@ -329,13 +409,19 @@ class VaaniKeyboardService : InputMethodService() {
         if (text.isEmpty()) {
             previewHindi.text = ""
             previewEnglish.text = ""
+            lastSuggestions = emptyList()
+            updateSuggestions()
             return
         }
 
         val devanagari = Transliterator.transliterate(text)
         previewHindi.text = devanagari
 
-        val lastWord = text.split(" ").lastOrNull() ?: ""
+        val cleaned = GrammarEngine.clean(text)
+        val lastWord = cleaned.split(" ").lastOrNull() ?: ""
         val translated = Transliterator.transliterate(lastWord)
         previewEnglish.text = "→ $translated"
+
+        updateSuggestions()
     }
+}
