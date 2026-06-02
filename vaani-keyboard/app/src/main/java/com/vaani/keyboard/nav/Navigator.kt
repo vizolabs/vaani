@@ -3,6 +3,7 @@ package com.vaani.keyboard.nav
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import com.vaani.keyboard.R
 import com.vaani.keyboard.ui.DashboardActivity
 import com.vaani.keyboard.ui.SettingsActivity
 import com.vaani.keyboard.ui.SetupActivity
@@ -32,8 +33,8 @@ object Navigator {
         from.startActivity(intent)
         if (from is Activity) {
             from.overridePendingTransition(
-                com.vaani.keyboard.R.anim.fade_in,
-                com.vaani.keyboard.R.anim.fade_out
+                R.anim.fade_in,
+                R.anim.fade_out
             )
             from.finish()
         }
@@ -44,8 +45,8 @@ object Navigator {
         from.startActivity(intent)
         if (from is Activity) {
             from.overridePendingTransition(
-                com.vaani.keyboard.R.anim.fade_in,
-                com.vaani.keyboard.R.anim.fade_out
+                R.anim.fade_in,
+                R.anim.fade_out
             )
             if (finishCurrent) from.finish()
         }
