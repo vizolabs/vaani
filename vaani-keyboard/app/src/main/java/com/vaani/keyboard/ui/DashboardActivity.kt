@@ -3,6 +3,7 @@ package com.vaani.keyboard.ui
 import android.os.Bundle
 import android.widget.TextView
 import com.vaani.keyboard.R
+import com.vaani.keyboard.util.PermissionHelper
 import java.util.Calendar
 
 class DashboardActivity : BaseActivity() {
@@ -21,5 +22,33 @@ class DashboardActivity : BaseActivity() {
         findViewById<TextView>(R.id.tv_greeting).text = greeting
         findViewById<TextView>(R.id.tv_status).text =
             getString(R.string.dashboard_ready, "हिन्दी")
+
+        val micStatus = findViewById<TextView>(R.id.tv_mic_status)
+        updateMicStatus(micStatus)
+        micStatus.setOnClickListener {
+            requestMicrophonePermission()
+        }
+    }
+
+    override fun onPermissionResult(granted: Boolean) {
+        findViewById<TextView>(R.id.tv_mic_status).let { updateMicStatus(it) }
+    }
+
+    private fun updateMicStatus(textView: TextView) {
+        if (PermissionHelper.hasRecordAudio(this)) {
+            textView.text = getString(R.string.perm_mic_enabled)
+            textView.setTextColor(getColorAccent())
+        } else {
+            textView.text = getString(R.string.perm_mic_disabled)
+            textView.setTextColor(getColorMuted())
+        }
+    }
+
+    private fun getColorAccent(): Int {
+        return androidx.core.content.ContextCompat.getColor(this, R.color.vaani_green)
+    }
+
+    private fun getColorMuted(): Int {
+        return androidx.core.content.ContextCompat.getColor(this, R.color.vaani_accent)
     }
 }

@@ -24,4 +24,13 @@
         android:textColor="@color/vaani_text_muted"
         android:textSize="15sp" />
 
+    <TextView
+        android:id="@+id/tv_mic_status"
+        style="@style/Widget.Vaani.StatusChip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:clickable="true"
+        android:focusable="true" />
+
 </LinearLayout>

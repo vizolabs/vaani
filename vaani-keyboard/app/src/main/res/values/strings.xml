@@ -20,4 +20,6 @@
     <string name="perm_mic_denied_title">Permission Required</string>
     <string name="perm_mic_denied_message">Microphone access was denied. Vaani needs this to convert your speech to text. You can enable it in Settings.</string>
     <string name="perm_open_settings">Open Settings</string>
+    <string name="perm_mic_enabled">Voice Input: Enabled</string>
+    <string name="perm_mic_disabled">Tap to Enable Voice Input</string>
 </resources>
