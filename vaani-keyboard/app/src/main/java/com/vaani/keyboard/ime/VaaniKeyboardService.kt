@@ -1,8 +1,11 @@
 package com.vaani.keyboard.ime
 
 import android.inputmethodservice.InputMethodService
+import android.os.Build
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -69,6 +72,27 @@ class VaaniKeyboardService : InputMethodService() {
     override fun onCreate() {
         super.onCreate()
         prefs = Prefs(this)
+    }
+
+    override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
+        super.onStartInputView(info, restarting)
+        detectSubtypeLanguage()
+    }
+
+    private fun detectSubtypeLanguage() {
+        val locale = try {
+            if (Build.VERSION.SDK_INT >= 25) {
+                currentInputMethodSubtype?.locale
+            } else {
+                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.currentInputMethodSubtype?.locale
+            }
+        } catch (_: Exception) { null }
+
+        when {
+            locale?.startsWith("hi") == true -> prefs.selectedLanguage = "hi"
+            locale?.startsWith("mr") == true -> prefs.selectedLanguage = "mr"
+        }
     }
 
     override fun onCreateInputView(): View {
