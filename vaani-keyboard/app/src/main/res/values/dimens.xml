@@ -34,4 +34,9 @@
     <!-- Voice mic button -->
     <dimen name="mic_button_size">48dp</dimen>
     <dimen name="mic_icon_size">24dp</dimen>
+
+    <!-- Suggestion bar -->
+    <dimen name="suggestion_bar_height">32dp</dimen>
+    <dimen name="suggestion_bar_gap">4dp</dimen>
+    <dimen name="suggestion_text_size">11sp</dimen>
 </resources>
