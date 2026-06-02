@@ -24,7 +24,7 @@
 
     <Button
         android:id="@+id/btn_lang_hindi"
-        style="@style/Widget.Vaani.Button"
+        style="@style/Widget.Vaani.LangOption"
         android:layout_width="280dp"
         android:layout_height="56dp"
         android:layout_marginTop="28dp"
@@ -33,7 +33,7 @@
 
     <Button
         android:id="@+id/btn_lang_marathi"
-        style="@style/Widget.Vaani.Button"
+        style="@style/Widget.Vaani.LangOption"
         android:layout_width="280dp"
         android:layout_height="56dp"
         android:layout_marginTop="12dp"
@@ -42,7 +42,7 @@
 
     <Button
         android:id="@+id/btn_lang_hinglish"
-        style="@style/Widget.Vaani.Button"
+        style="@style/Widget.Vaani.LangOption"
         android:layout_width="280dp"
         android:layout_height="56dp"
         android:layout_marginTop="12dp"

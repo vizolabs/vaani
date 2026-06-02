@@ -52,4 +52,12 @@
         <item name="android:fontFamily">sans-serif</item>
     </style>
 
+    <style name="Widget.Vaani.LangOption" parent="Widget.AppCompat.Button">
+        <item name="android:backgroundTint">@color/vaani_surface_card</item>
+        <item name="android:textColor">@color/vaani_text</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
 </resources>
