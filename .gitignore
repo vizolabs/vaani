@@ -1,0 +1,18 @@
+# Android
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# App build
+/app/build
+/app/release
+
+# Gradle wrapper (jar is binary, not committed)
+/vaani-keyboard/gradle/wrapper/gradle-wrapper.jar

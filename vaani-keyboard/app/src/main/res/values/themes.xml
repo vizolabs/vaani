@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Vaani" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/vaani_accent</item>
+        <item name="colorPrimaryDark">@color/vaani_dark</item>
+        <item name="colorAccent">@color/vaani_accent</item>
+        <item name="android:windowBackground">@color/vaani_dark</item>
+        <item name="android:statusBarColor">@color/vaani_dark</item>
+        <item name="android:navigationBarColor">@color/vaani_dark</item>
+    </style>
+
+    <style name="Theme.Vaani.Splash" parent="Theme.Vaani">
+        <item name="android:windowBackground">@color/vaani_dark</item>
+    </style>
+
+    <style name="Theme.Vaani.Keyboard" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowBackground">@color/vaani_dark</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/vaani_dark</item>
+    </style>
+</resources>
