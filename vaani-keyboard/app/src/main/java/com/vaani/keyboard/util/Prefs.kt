@@ -25,6 +25,14 @@ class Prefs(context: Context) {
         translationCount = translationCount + 1
     }
 
+    var lastActiveTimestamp: Long
+        get() = prefs.getLong(KEY_LAST_ACTIVE, 0L)
+        set(value) = prefs.edit { putLong(KEY_LAST_ACTIVE, value) }
+
+    fun markActive() {
+        lastActiveTimestamp = System.currentTimeMillis()
+    }
+
     fun clear() {
         prefs.edit { clear() }
     }
@@ -33,5 +41,6 @@ class Prefs(context: Context) {
         private const val KEY_SETUP_COMPLETE = "setup_complete"
         private const val KEY_LANGUAGE = "selected_language"
         private const val KEY_TRANSLATION_COUNT = "translation_count"
+        private const val KEY_LAST_ACTIVE = "last_active_timestamp"
     }
 }
