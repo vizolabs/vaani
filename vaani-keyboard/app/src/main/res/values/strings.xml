@@ -11,4 +11,13 @@
     <string name="subtype_hindi">हिन्दी (Hindi)</string>
     <string name="subtype_marathi">मराठी (Marathi)</string>
     <string name="subtype_hinglish">Hinglish</string>
+
+    <!-- Permissions -->
+    <string name="perm_mic_rationale_title">Microphone Access</string>
+    <string name="perm_mic_rationale_message">Vaani needs microphone access to convert your voice into text. Your speech is processed entirely on your phone — nothing is sent online.</string>
+    <string name="perm_dialog_allow">Allow</string>
+    <string name="perm_dialog_not_now">Not Now</string>
+    <string name="perm_mic_denied_title">Permission Required</string>
+    <string name="perm_mic_denied_message">Microphone access was denied. Vaani needs this to convert your speech to text. You can enable it in Settings.</string>
+    <string name="perm_open_settings">Open Settings</string>
 </resources>
