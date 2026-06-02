@@ -44,6 +44,48 @@
 
     </LinearLayout>
 
+    <!-- Suggestion Bar -->
+    <LinearLayout
+        android:id="@+id/suggestion_bar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/suggestion_bar_height"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="@dimen/suggestion_bar_gap"
+        android:paddingHorizontal="4dp">
+
+        <TextView
+            android:id="@+id/suggestion_1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="@color/kb_preview_english"
+            android:textSize="@dimen/suggestion_text_size"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/suggestion_2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="@color/kb_preview_english"
+            android:textSize="@dimen/suggestion_text_size"
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/suggestion_3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:textColor="@color/kb_preview_english"
+            android:textSize="@dimen/suggestion_text_size"
+            android:visibility="invisible" />
+
+    </LinearLayout>
+
     <!-- Row 1: q w e r t y u i o p backspace -->
     <LinearLayout
         android:layout_width="match_parent"
