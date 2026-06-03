@@ -14,11 +14,20 @@ import androidx.core.content.ContextCompat
 import com.vaani.keyboard.R
 import com.vaani.keyboard.util.AutoCompleteHelper
 import com.vaani.keyboard.util.GrammarEngine
+import com.vaani.keyboard.util.ModelManager
+import com.vaani.keyboard.util.NllbTranslator
+import com.vaani.keyboard.util.NllbTokenizer
 import com.vaani.keyboard.util.PermissionHelper
 import com.vaani.keyboard.util.Prefs
 import com.vaani.keyboard.util.SpeechRecognizerHelper
 import com.vaani.keyboard.util.TranslateEngine
+import com.vaani.keyboard.util.TranslationResult
 import com.vaani.keyboard.util.Transliterator
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import java.io.File
 
 class VaaniKeyboardService : InputMethodService() {
 
@@ -43,6 +52,11 @@ class VaaniKeyboardService : InputMethodService() {
     private val sentenceEndChars = setOf(".", "!", "?")
     private val autoSpaceChars = setOf(".", "!", "?", ",", ";", ":")
     private val doubleSpaceMs = 500L
+
+    private var nllbTokenizer: NllbTokenizer? = null
+    private var nllbTranslator: NllbTranslator? = null
+    private var isAiTranslating = false
+    private val aiScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     private val letterKeyIds = listOf(
         R.id.key_q, R.id.key_w, R.id.key_e, R.id.key_r, R.id.key_t,
@@ -82,6 +96,35 @@ class VaaniKeyboardService : InputMethodService() {
     override fun onCreate() {
         super.onCreate()
         prefs = Prefs(this)
+        warmUpTranslator()
+    }
+
+    private fun getModelDir(): File {
+        return File(filesDir, "models").also { it.mkdirs() }
+    }
+
+    private fun warmUpTranslator() {
+        if (!prefs.modelDownloaded) return
+        aiScope.launch(Dispatchers.IO) {
+            try {
+                val modelDir = getModelDir()
+                val tokenizerPath = File(modelDir, "sentencepiece.bpe.model").absolutePath
+                val tokenizer = NllbTokenizer(tokenizerPath)
+                nllbTokenizer = tokenizer
+                if (!tokenizer.isLoaded()) {
+                    nllbTokenizer = null
+                    return@launch
+                }
+                val encoderPath = File(modelDir, "encoder_model_quantized.onnx").absolutePath
+                val decoderPath = File(modelDir, "decoder_with_past_model_quantized.onnx").absolutePath
+                val translator = NllbTranslator(encoderPath, decoderPath, tokenizer)
+                if (translator.load()) {
+                    nllbTranslator = translator
+                }
+            } catch (_: Exception) {
+                nllbTranslator = null
+            }
+        }
     }
 
     override fun onStartInput(info: EditorInfo?, restarting: Boolean) {
@@ -478,14 +521,52 @@ class VaaniKeyboardService : InputMethodService() {
             return
         }
 
-        val english = TranslateEngine.translate(rawText)
+        if (prefs.modelDownloaded && !isAiTranslating) {
+            tryTranslateWithAi(rawText, ic)
+        } else {
+            doTranslateFallback(rawText, ic)
+        }
+    }
 
+    private fun tryTranslateWithAi(rawText: String, ic: android.view.inputmethod.InputConnection) {
+        isAiTranslating = true
+        aiScope.launch {
+            val result = withContext(Dispatchers.IO) {
+                try {
+                    val translator = nllbTranslator
+                    if (translator != null && translator.isLoaded()) {
+                        translator.translate(rawText)
+                    } else {
+                        TranslationResult.Error("AI translator not loaded")
+                    }
+                } catch (e: Exception) {
+                    TranslationResult.Error(e.message ?: "AI translation error")
+                }
+            }
+
+            when (result) {
+                is TranslationResult.Success -> {
+                    ic.deleteSurroundingText(currentInput.length, 0)
+                    ic.commitText(result.text, 1)
+                    currentInput.clear()
+                }
+                is TranslationResult.Fallback, is TranslationResult.Error -> {
+                    doTranslateFallback(rawText, ic)
+                }
+            }
+
+            isAiTranslating = false
+            prefs.incrementTranslationCount()
+            prefs.markActive()
+            updatePreview()
+        }
+    }
+
+    private fun doTranslateFallback(rawText: String, ic: android.view.inputmethod.InputConnection) {
+        val english = TranslateEngine.translate(rawText)
         ic.deleteSurroundingText(currentInput.length, 0)
         ic.commitText(english, 1)
         currentInput.clear()
-        prefs.incrementTranslationCount()
-        prefs.markActive()
-        updatePreview()
     }
 
     private fun commitText(text: String) {
@@ -513,6 +594,8 @@ class VaaniKeyboardService : InputMethodService() {
         super.onDestroy()
         speechHelper?.stopListening()
         speechHelper = null
+        nllbTranslator?.close()
+        nllbTranslator = null
     }
 
     private fun updateShiftKeyAppearance() {

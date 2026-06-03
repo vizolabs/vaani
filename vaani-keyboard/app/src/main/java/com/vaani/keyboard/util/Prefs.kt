@@ -45,6 +45,14 @@ class Prefs(context: Context) {
         get() = prefs.getBoolean(KEY_SOUND, false)
         set(value) = prefs.edit { putBoolean(KEY_SOUND, value) }
 
+    var modelDownloaded: Boolean
+        get() = prefs.getBoolean(KEY_MODEL_DOWNLOADED, false)
+        set(value) = prefs.edit { putBoolean(KEY_MODEL_DOWNLOADED, value) }
+
+    var modelDownloadProgress: Int
+        get() = prefs.getInt(KEY_MODEL_DOWNLOAD_PROGRESS, 0)
+        set(value) = prefs.edit { putInt(KEY_MODEL_DOWNLOAD_PROGRESS, value) }
+
     fun clear() {
         prefs.edit { clear() }
     }
@@ -57,5 +65,7 @@ class Prefs(context: Context) {
         private const val KEY_KEYBOARD_HEIGHT = "keyboard_height"
         private const val KEY_HAPTIC = "haptic_feedback"
         private const val KEY_SOUND = "key_sound"
+        private const val KEY_MODEL_DOWNLOADED = "model_downloaded"
+        private const val KEY_MODEL_DOWNLOAD_PROGRESS = "model_download_progress"
     }
 }
