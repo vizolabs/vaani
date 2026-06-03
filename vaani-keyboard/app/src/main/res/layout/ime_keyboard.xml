@@ -148,7 +148,7 @@
 
     </LinearLayout>
 
-    <!-- Row 4: ?123 mic space . send -->
+    <!-- Row 4: ?123 lang mic space . send -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/kb_key_height"
@@ -163,6 +163,14 @@
             android:text="@string/kb_symbol_toggle" />
 
         <Button
+            android:id="@+id/key_lang"
+            style="@style/Widget.Vaani.Key"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="HI"
+            android:fontFamily="sans-serif-medium" />
+
+        <Button
             android:id="@+id/key_mic"
             style="@style/Widget.Vaani.Key"
             android:layout_width="0dp"
@@ -175,7 +183,7 @@
             android:id="@+id/key_space"
             style="@style/Widget.Vaani.Key"
             android:layout_width="0dp"
-            android:layout_weight="5"
+            android:layout_weight="4"
             android:text="" />
 
         <Button
