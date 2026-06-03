@@ -512,9 +512,9 @@ class VaaniKeyboardService : InputMethodService() {
 
     private fun updateLangKeyText() {
         val label = when (prefs.selectedLanguage) {
-            "hi" -> "HI"
-            "mr" -> "MR"
-            else -> "EN"
+            "hi" -> getString(R.string.lang_label_hi)
+            "mr" -> getString(R.string.lang_label_mr)
+            else -> getString(R.string.lang_label_en)
         }
         qwertyView.findViewById<Button>(R.id.key_lang)?.text = label
         symbolsView.findViewById<Button>(R.id.key_lang_sym)?.text = label
