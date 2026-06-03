@@ -34,6 +34,14 @@
         android:focusable="true" />
 
     <TextView
+        android:id="@+id/tv_translation_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textColor="@color/vaani_text_muted"
+        android:textSize="13sp" />
+
+    <TextView
         android:id="@+id/tv_settings_link"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
