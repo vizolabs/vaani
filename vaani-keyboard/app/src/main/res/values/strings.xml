@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">Vaani</string>
     <string name="app_tagline">Speak Your Language. We Write English.</string>
-    <string name="btn_get_started">Get Started</string>
     <string name="greeting_morning">Good Morning</string>
     <string name="greeting_afternoon">Good Afternoon</string>
     <string name="greeting_evening">Good Evening</string>
@@ -17,9 +16,7 @@
     <string name="perm_mic_rationale_message">Vaani needs microphone access to convert your voice into text. Your speech is processed entirely on your phone — nothing is sent online.</string>
     <string name="perm_dialog_allow">Allow</string>
     <string name="perm_dialog_not_now">Not Now</string>
-    <string name="perm_mic_denied_title">Permission Required</string>
     <string name="perm_mic_denied_message">Microphone access was denied. Vaani needs this to convert your speech to text. You can enable it in Settings.</string>
-    <string name="perm_open_settings">Open Settings</string>
     <string name="perm_mic_enabled">Voice Input: Enabled</string>
     <string name="perm_mic_disabled">Tap to Enable Voice Input</string>
 
@@ -57,10 +54,13 @@
     <!-- Voice Input -->
     <string name="voice_listening">Listening...</string>
     <string name="voice_error">Voice input error: %s</string>
-    <string name="voice_no_speech">No speech detected. Try again.</string>
     <string name="voice_unavailable">Speech recognition not available on this device</string>
 
     <!-- Keyboard -->
     <string name="kb_symbol_toggle">12#</string>
     <string name="kb_abc_toggle">ABC</string>
+
+    <!-- Dashboard Stats -->
+    <string name="dashboard_translations">Translations made: %d</string>
+    <string name="dashboard_translations_none">No translations yet. Start typing!</string>
 </resources>
