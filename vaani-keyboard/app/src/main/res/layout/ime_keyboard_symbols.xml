@@ -88,6 +88,7 @@
 
     <!-- Row 1: 1 2 3 4 5 6 7 8 9 0 -->
     <LinearLayout
+        android:id="@+id/kb_sym_row_1"
         android:layout_width="match_parent"
         android:layout_height="@dimen/kb_key_height"
         android:orientation="horizontal"
@@ -108,6 +109,7 @@
 
     <!-- Row 2: @ # $ % & * - + ( ) -->
     <LinearLayout
+        android:id="@+id/kb_sym_row_2"
         android:layout_width="match_parent"
         android:layout_height="@dimen/kb_key_height"
         android:orientation="horizontal"
@@ -128,6 +130,7 @@
 
     <!-- Row 3: [ ] { } < > = | ~ ` backspace -->
     <LinearLayout
+        android:id="@+id/kb_sym_row_3"
         android:layout_width="match_parent"
         android:layout_height="@dimen/kb_key_height"
         android:orientation="horizontal"
@@ -149,6 +152,7 @@
 
     <!-- Row 4: ABC lang mic space . send -->
     <LinearLayout
+        android:id="@+id/kb_sym_row_4"
         android:layout_width="match_parent"
         android:layout_height="@dimen/kb_key_height"
         android:orientation="horizontal"

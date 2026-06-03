@@ -88,6 +88,7 @@
 
     <!-- Row 1: q w e r t y u i o p backspace -->
     <LinearLayout
+        android:id="@+id/kb_row_1"
         android:layout_width="match_parent"
         android:layout_height="@dimen/kb_key_height"
         android:orientation="horizontal"
@@ -109,6 +110,7 @@
 
     <!-- Row 2: a s d f g h j k l enter -->
     <LinearLayout
+        android:id="@+id/kb_row_2"
         android:layout_width="match_parent"
         android:layout_height="@dimen/kb_key_height"
         android:orientation="horizontal"
@@ -129,6 +131,7 @@
 
     <!-- Row 3: shift z x c v b n m , . / -->
     <LinearLayout
+        android:id="@+id/kb_row_3"
         android:layout_width="match_parent"
         android:layout_height="@dimen/kb_key_height"
         android:orientation="horizontal"
@@ -150,6 +153,7 @@
 
     <!-- Row 4: ?123 lang mic space . send -->
     <LinearLayout
+        android:id="@+id/kb_row_4"
         android:layout_width="match_parent"
         android:layout_height="@dimen/kb_key_height"
         android:orientation="horizontal"

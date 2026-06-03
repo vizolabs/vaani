@@ -2032,31 +2032,63 @@ object TranslateEngine {
         put("jau", "barley")
     }
 
+    private val knownVerbs = setOf(
+        "eat", "drink", "go", "come", "do", "make", "take", "give", "get", "see",
+        "tell", "show", "ask", "help", "like", "love", "want", "need", "know",
+        "think", "say", "put", "bring", "buy", "sell", "send", "receive", "find",
+        "keep", "hold", "carry", "pull", "push", "open", "close", "start", "stop",
+        "finish", "work", "play", "read", "write", "speak", "talk", "listen",
+        "hear", "watch", "look", "run", "walk", "sit", "stand", "sleep", "wake",
+        "wash", "clean", "cook", "cut", "break", "fix", "build", "grow", "change",
+        "move", "turn", "call", "answer", "meet", "visit", "wait", "try", "pay",
+        "use", "live", "die", "win", "lose", "fight", "sing", "dance", "draw",
+        "paint", "teach", "learn", "study", "understand", "remember", "forget",
+        "believe", "hope", "wish", "share", "save", "spend", "waste", "miss",
+        "catch", "throw", "kick", "hit", "pick", "choose", "decide", "plan",
+        "allow", "forbid", "invite", "join", "leave", "arrive", "return",
+        "order", "serve", "prepare", "boil", "fry", "bake", "roast", "grill",
+        "steam", "stir", "mix", "add", "put", "keep", "said", "gave", "took",
+        "ate", "drank", "went", "came", "did", "made", "told", "brought",
+        "bought", "sold", "sent", "found", "taught", "learnt", "meant",
+        "built", "spent", "lost", "won", "drove", "rode", "swam", "sang",
+        "threw", "caught", "slept", "woke", "wore", "chose", "spoke",
+        "broke", "froze", "grew", "hid", "bit", "blew", "drew", "flew",
+        "forgot", "forgave", "hung", "led", "paid", "quit", "rang", "rose",
+        "shook", "shone", "shut", "sank", "slid", "stole", "stuck", "swore",
+        "swept", "swung", "tore", "understood", "wound", "wrote",
+    )
+
+    private val subjects = setOf("I", "You", "He", "She", "We", "They", "It")
+
     private fun reorderToEnglish(text: String): String {
-        val words = text.split(" ").toMutableList()
+        var result = text
 
         val removals = setOf("raha", "rahi", "rahe", "hoon", "ho", "hain", "hai", "tha", "the", "thi", "thay", "hoga", "hogee", "honge", "kar", "karke", "ke", "kar ke", "kr", "wala", "wali", "wale", "ne", "se", "mein", "ko", "ka", "ki")
-        words.removeAll { it.lowercase() in removals }
+        result = result.split(" ").filter { it.lowercase() !in removals }.joinToString(" ")
 
+        val words = result.split(" ").toMutableList()
         if (words.size <= 2) return words.joinToString(" ")
 
+        val firstCap = words[0].replaceFirstChar { it.uppercase() }
+        val isSubject = firstCap in subjects
+        if (!isSubject) return result
+
         val beVerbs = setOf("am", "is", "are", "was", "were", "been", "being")
-        val subjects = setOf("I", "You", "He", "She", "We", "They", "It")
 
-        if (words.size >= 4 && words[0] in subjects) {
-            val ingIdx = words.indexOfFirst { it.endsWith("ing") }
-            val beIdx = words.indexOfFirst { it in beVerbs }
+        val ingIdx = words.indexOfFirst { it.endsWith("ing") }
+        val beIdx = words.indexOfFirst { it in beVerbs }
 
-            if (ingIdx > 1) {
-                val verb = words.removeAt(ingIdx)
-                val insertAt = if (beIdx >= 0) beIdx + 1 else 1
+        if (ingIdx > 1 && beIdx >= 0) {
+            val verb = words.removeAt(ingIdx)
+            val insertAt = beIdx + 1
+            if (insertAt <= words.size) words.add(insertAt, verb) else words.add(verb)
+            return words.joinToString(" ")
+        }
 
-                if (insertAt <= words.size) {
-                    words.add(if (beIdx >= 0) insertAt else 1, verb)
-                } else {
-                    words.add(verb)
-                }
-            }
+        val lastVerbIdx = words.indices.lastOrNull { words[it].lowercase() in knownVerbs }
+        if (lastVerbIdx != null && lastVerbIdx == words.size - 1 && lastVerbIdx > 1) {
+            val verb = words.removeAt(lastVerbIdx)
+            words.add(1, verb)
         }
 
         return words.joinToString(" ")

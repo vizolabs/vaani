@@ -55,6 +55,45 @@
             android:text="@string/subtype_hinglish"
             android:textSize="15sp" />
 
+        <!-- Keyboard Height Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="Keyboard Height"
+            android:textColor="@color/vaani_text"
+            android:textSize="15sp"
+            android:fontFamily="sans-serif-medium" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/tv_keyboard_height_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="100%"
+                android:textColor="@color/vaani_text"
+                android:textSize="14sp"
+                android:minWidth="48dp" />
+
+            <SeekBar
+                android:id="@+id/seek_keyboard_height"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="12dp"
+                android:max="80"
+                android:progress="40"
+                android:progressTint="@color/vaani_accent" />
+
+        </LinearLayout>
+
         <!-- About Section -->
         <TextView
             android:layout_width="wrap_content"

@@ -33,6 +33,10 @@ class Prefs(context: Context) {
         lastActiveTimestamp = System.currentTimeMillis()
     }
 
+    var keyboardHeightPercent: Int
+        get() = prefs.getInt(KEY_KEYBOARD_HEIGHT, 100)
+        set(value) = prefs.edit { putInt(KEY_KEYBOARD_HEIGHT, value) }
+
     fun clear() {
         prefs.edit { clear() }
     }
@@ -42,5 +46,6 @@ class Prefs(context: Context) {
         private const val KEY_LANGUAGE = "selected_language"
         private const val KEY_TRANSLATION_COUNT = "translation_count"
         private const val KEY_LAST_ACTIVE = "last_active_timestamp"
+        private const val KEY_KEYBOARD_HEIGHT = "keyboard_height"
     }
 }

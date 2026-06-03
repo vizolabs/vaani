@@ -1,6 +1,7 @@
 package com.vaani.keyboard.ime
 
 import android.inputmethodservice.InputMethodService
+import android.view.HapticFeedbackConstants
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -34,6 +35,7 @@ class VaaniKeyboardService : InputMethodService() {
     private lateinit var qwertyView: View
     private lateinit var symbolsView: View
     private var speechHelper: SpeechRecognizerHelper? = null
+    private val keyboardRows = mutableListOf<View>()
 
     private val letterKeyIds = listOf(
         R.id.key_q, R.id.key_w, R.id.key_e, R.id.key_r, R.id.key_t,
@@ -122,6 +124,19 @@ class VaaniKeyboardService : InputMethodService() {
         setupQwertyKeys(qwertyView)
         setupSymbolKeys(symbolsView)
         updateLangKeyText()
+
+        keyboardRows.clear()
+        keyboardRows.addAll(listOf(
+            qwertyView.findViewById(R.id.kb_row_1),
+            qwertyView.findViewById(R.id.kb_row_2),
+            qwertyView.findViewById(R.id.kb_row_3),
+            qwertyView.findViewById(R.id.kb_row_4),
+            symbolsView.findViewById(R.id.kb_sym_row_1),
+            symbolsView.findViewById(R.id.kb_sym_row_2),
+            symbolsView.findViewById(R.id.kb_sym_row_3),
+            symbolsView.findViewById(R.id.kb_sym_row_4),
+        ))
+        applyKeyboardHeight()
 
         return keyboardContainer
     }
@@ -243,9 +258,25 @@ class VaaniKeyboardService : InputMethodService() {
         setKeyListener(root, R.id.key_send_sym, "send")
     }
 
+    private fun applyKeyboardHeight() {
+        val percent = prefs.keyboardHeightPercent
+        val baseDp = 34f
+        val targetDp = baseDp * percent / 100f
+        val targetPx = (targetDp * resources.displayMetrics.density).toInt()
+        for (row in keyboardRows) {
+            if (row != null) {
+                row.layoutParams.height = targetPx
+                row.requestLayout()
+            }
+        }
+    }
+
     private fun setKeyListener(root: View, id: Int, value: String) {
         val key = root.findViewById<Button>(id) ?: return
-        key.setOnClickListener { onKeyPressed(value) }
+        key.setOnClickListener {
+            key.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+            onKeyPressed(value)
+        }
         key.setOnLongClickListener {
             onKeyLongPressed(value)
             true

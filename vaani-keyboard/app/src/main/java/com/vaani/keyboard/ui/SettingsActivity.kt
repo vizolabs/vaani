@@ -2,6 +2,8 @@ package com.vaani.keyboard.ui
 
 import android.os.Bundle
 import android.widget.Button
+import android.widget.SeekBar
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.vaani.keyboard.R
@@ -13,6 +15,7 @@ class SettingsActivity : BaseActivity() {
         setContentView(R.layout.activity_settings)
 
         setupLanguageButtons()
+        setupKeyboardHeight()
     }
 
     private fun setupLanguageButtons() {
@@ -48,6 +51,25 @@ class SettingsActivity : BaseActivity() {
             this,
             if (selected) R.color.vaani_accent else R.color.vaani_surface_card
         )
+    }
+
+    private fun setupKeyboardHeight() {
+        val seekBar = findViewById<SeekBar>(R.id.seek_keyboard_height)
+        val label = findViewById<TextView>(R.id.tv_keyboard_height_value)
+
+        val current = prefs.keyboardHeightPercent
+        seekBar.progress = current - 60
+        label.text = "$current%"
+
+        seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+            override fun onProgressChanged(seek: SeekBar, progress: Int, fromUser: Boolean) {
+                val percent = progress + 60
+                label.text = "$percent%"
+                prefs.keyboardHeightPercent = percent
+            }
+            override fun onStartTrackingTouch(seek: SeekBar?) {}
+            override fun onStopTrackingTouch(seek: SeekBar?) {}
+        })
     }
 
     private fun showSaved() {

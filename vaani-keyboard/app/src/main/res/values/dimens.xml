@@ -1,41 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Keyboard -->
     <dimen name="kb_key_height">34dp</dimen>
     <dimen name="kb_key_gap">4dp</dimen>
-    <dimen name="kb_key_small">24dp</dimen>
-    <dimen name="kb_key_letter">28dp</dimen>
-    <dimen name="kb_key_fn">38dp</dimen>
-    <dimen name="kb_key_space">130dp</dimen>
-    <dimen name="kb_key_mic">36dp</dimen>
-    <dimen name="kb_key_send">42dp</dimen>
     <dimen name="kb_preview_height">48dp</dimen>
     <dimen name="kb_padding_bottom">12dp</dimen>
     <dimen name="kb_padding_horizontal">4dp</dimen>
-
-    <!-- Spacing -->
-    <dimen name="spacing_small">8dp</dimen>
-    <dimen name="spacing_medium">16dp</dimen>
-    <dimen name="spacing_large">24dp</dimen>
-    <dimen name="spacing_xlarge">32dp</dimen>
-
-    <!-- Corner radius -->
-    <dimen name="radius_small">6dp</dimen>
-    <dimen name="radius_medium">10dp</dimen>
-    <dimen name="radius_large">16dp</dimen>
-
-    <!-- Preview bar -->
-    <dimen name="preview_bar_height">48dp</dimen>
-    <dimen name="preview_bar_margin_h">4dp</dimen>
-    <dimen name="preview_bar_margin_b">4dp</dimen>
-    <dimen name="preview_bar_text_size">12sp</dimen>
-    <dimen name="preview_bar_english_size">14sp</dimen>
-
-    <!-- Voice mic button -->
-    <dimen name="mic_button_size">48dp</dimen>
-    <dimen name="mic_icon_size">24dp</dimen>
-
-    <!-- Suggestion bar -->
     <dimen name="suggestion_bar_height">32dp</dimen>
     <dimen name="suggestion_bar_gap">4dp</dimen>
     <dimen name="suggestion_text_size">11sp</dimen>
