@@ -21,8 +21,10 @@ object GrammarEngine {
         return result
     }
 
+    private val whitespacePattern = Regex("\\s+")
+
     private fun normalizeWhitespace(text: String): String {
-        return text.replace(Regex("\\s+"), " ").trim()
+        return text.replace(whitespacePattern, " ").trim()
     }
 
     private val contractions = mapOf(
@@ -211,30 +213,36 @@ object GrammarEngine {
         "\\b(${possessionExclusions.joinToString("|")})\\b", RegexOption.IGNORE_CASE
     )
 
+    private val iAmHavingPattern = Regex("\\bI am having\\b", RegexOption.IGNORE_CASE)
+
+    private val tensePatterns = arrayOf(
+        Regex("\\bhave you ate\\b", RegexOption.IGNORE_CASE) to "have you eaten",
+        Regex("\\bdid you ate\\b", RegexOption.IGNORE_CASE) to "did you eat",
+        Regex("\\bdid you went\\b", RegexOption.IGNORE_CASE) to "did you go",
+        Regex("\\bdid you did\\b", RegexOption.IGNORE_CASE) to "did you do",
+        Regex("\\bdid you came\\b", RegexOption.IGNORE_CASE) to "did you come",
+        Regex("\\bdid you took\\b", RegexOption.IGNORE_CASE) to "did you take",
+        Regex("\\bdid you gave\\b", RegexOption.IGNORE_CASE) to "did you give",
+        Regex("\\bI have been completed\\b", RegexOption.IGNORE_CASE) to "I have completed",
+        Regex("\\bI have been finished\\b", RegexOption.IGNORE_CASE) to "I have finished",
+        Regex("\\bI am (?:not )?come\\b", RegexOption.IGNORE_CASE) to "I have come",
+        Regex("\\bI am (?:not )?went\\b", RegexOption.IGNORE_CASE) to "I went",
+        Regex("\\b(?:He|She) is come\\b", RegexOption.IGNORE_CASE) to "has come",
+        Regex("\\b(?:He|She) is went\\b", RegexOption.IGNORE_CASE) to "went",
+    )
+
     private fun fixTenseMismatch(text: String): String {
         var result = text
 
-        result = result.replace(Regex("\\bI am having\\b", RegexOption.IGNORE_CASE)) {
+        result = iAmHavingPattern.replace(result) {
             val hasPossession = possessionNounPattern.containsMatchIn(result.substringAfter("having"))
             val hasExclusion = possessionExclusionPattern.containsMatchIn(result.substringAfter("having"))
             if (hasPossession && !hasExclusion) "I have" else it.value
         }
 
-        result = result.replace(Regex("\\bhave you ate\\b", RegexOption.IGNORE_CASE)) { "have you eaten" }
-        result = result.replace(Regex("\\bdid you ate\\b", RegexOption.IGNORE_CASE)) { "did you eat" }
-        result = result.replace(Regex("\\bdid you went\\b", RegexOption.IGNORE_CASE)) { "did you go" }
-        result = result.replace(Regex("\\bdid you did\\b", RegexOption.IGNORE_CASE)) { "did you do" }
-        result = result.replace(Regex("\\bdid you came\\b", RegexOption.IGNORE_CASE)) { "did you come" }
-        result = result.replace(Regex("\\bdid you took\\b", RegexOption.IGNORE_CASE)) { "did you take" }
-        result = result.replace(Regex("\\bdid you gave\\b", RegexOption.IGNORE_CASE)) { "did you give" }
-
-        result = result.replace(Regex("\\bI have been completed\\b", RegexOption.IGNORE_CASE)) { "I have completed" }
-        result = result.replace(Regex("\\bI have been finished\\b", RegexOption.IGNORE_CASE)) { "I have finished" }
-
-        result = result.replace(Regex("\\bI am (?:not )?come\\b", RegexOption.IGNORE_CASE)) { "I have come" }
-        result = result.replace(Regex("\\bI am (?:not )?went\\b", RegexOption.IGNORE_CASE)) { "I went" }
-        result = result.replace(Regex("\\b(?:He|She) is come\\b", RegexOption.IGNORE_CASE)) { "has come" }
-        result = result.replace(Regex("\\b(?:He|She) is went\\b", RegexOption.IGNORE_CASE)) { "went" }
+        for ((regex, replacement) in tensePatterns) {
+            result = regex.replace(result, replacement)
+        }
 
         return result
     }
