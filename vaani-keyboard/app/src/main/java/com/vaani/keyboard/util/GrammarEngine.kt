@@ -250,16 +250,17 @@ object GrammarEngine {
         return text[0].uppercase() + text.substring(1)
     }
 
+    private val sentenceEnders = setOf('.', '!', '?', ':', ';')
+
     private fun fixEndPunctuation(text: String): String {
         val trimmed = text.trimEnd()
         if (trimmed.isEmpty()) return text
 
         val last = trimmed.last()
-        if (last in listOf('.', '!', '?', ':', ';')) return trimmed
+        if (last in sentenceEnders) return trimmed
 
         if (trimmed.endsWith("...")) return trimmed
 
-        if (trimmed.length > 10) return "$trimmed."
-        return trimmed
+        return "$trimmed."
     }
 }
