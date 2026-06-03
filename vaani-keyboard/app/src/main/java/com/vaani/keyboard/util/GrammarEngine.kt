@@ -155,31 +155,37 @@ object GrammarEngine {
         return result
     }
 
+    private val articlePatterns = arrayOf(
+        Regex("\\ba\\b\\s+(?=[aeiouAEIOU])") to "an ",
+        Regex("\\bthe my\\b", RegexOption.IGNORE_CASE) to "my",
+        Regex("\\bthe your\\b", RegexOption.IGNORE_CASE) to "your",
+        Regex("\\bthe his\\b", RegexOption.IGNORE_CASE) to "his",
+        Regex("\\bthe her\\b", RegexOption.IGNORE_CASE) to "her",
+        Regex("\\bthe our\\b", RegexOption.IGNORE_CASE) to "our",
+        Regex("\\bthe their\\b", RegexOption.IGNORE_CASE) to "their",
+    )
+
     private fun fixArticles(text: String): String {
         var result = text
-
-        result = result.replace(Regex("\\ba\\b\\s+(?=[aeiouAEIOU])")) { "an " }
-
+        for ((regex, replacement) in articlePatterns) {
+            result = regex.replace(result, replacement)
+        }
         result = result.replace("a an ", "an ")
-
-        result = result.replace(Regex("\\bthe my\\b", RegexOption.IGNORE_CASE)) { "my" }
-        result = result.replace(Regex("\\bthe your\\b", RegexOption.IGNORE_CASE)) { "your" }
-        result = result.replace(Regex("\\bthe his\\b", RegexOption.IGNORE_CASE)) { "his" }
-        result = result.replace(Regex("\\bthe her\\b", RegexOption.IGNORE_CASE)) { "her" }
-        result = result.replace(Regex("\\bthe our\\b", RegexOption.IGNORE_CASE)) { "our" }
-        result = result.replace(Regex("\\bthe their\\b", RegexOption.IGNORE_CASE)) { "their" }
-
         return result
     }
 
+    private val prepositionPatterns = arrayOf(
+        Regex("\\bcoupleds of\\b", RegexOption.IGNORE_CASE) to "couple of",
+        Regex("\\bmore better\\b", RegexOption.IGNORE_CASE) to "better",
+        Regex("\\bmore bigger\\b", RegexOption.IGNORE_CASE) to "bigger",
+        Regex("\\bmore smaller\\b", RegexOption.IGNORE_CASE) to "smaller",
+    )
+
     private fun fixPrepositions(text: String): String {
         var result = text
-
-        result = result.replace(Regex("\\bcoupleds of\\b", RegexOption.IGNORE_CASE)) { "couple of" }
-        result = result.replace(Regex("\\bmore better\\b", RegexOption.IGNORE_CASE)) { "better" }
-        result = result.replace(Regex("\\bmore bigger\\b", RegexOption.IGNORE_CASE)) { "bigger" }
-        result = result.replace(Regex("\\bmore smaller\\b", RegexOption.IGNORE_CASE)) { "smaller" }
-
+        for ((regex, replacement) in prepositionPatterns) {
+            result = regex.replace(result, replacement)
+        }
         return result
     }
 
@@ -231,17 +237,21 @@ object GrammarEngine {
         return result
     }
 
+    private val redundancyPatterns = arrayOf(
+        Regex("\\brevert back\\b", RegexOption.IGNORE_CASE) to "revert",
+        Regex("\\breturn back\\b", RegexOption.IGNORE_CASE) to "return",
+        Regex("\\brepeat again\\b", RegexOption.IGNORE_CASE) to "repeat",
+        Regex("\\breply back\\b", RegexOption.IGNORE_CASE) to "reply",
+        Regex("\\bATM machine\\b", RegexOption.IGNORE_CASE) to "ATM",
+        Regex("\\bPIN number\\b", RegexOption.IGNORE_CASE) to "PIN",
+        Regex("\\bISBN number\\b", RegexOption.IGNORE_CASE) to "ISBN",
+    )
+
     private fun fixRedundancy(text: String): String {
         var result = text
-
-        result = result.replace(Regex("\\brevert back\\b", RegexOption.IGNORE_CASE)) { "revert" }
-        result = result.replace(Regex("\\breturn back\\b", RegexOption.IGNORE_CASE)) { "return" }
-        result = result.replace(Regex("\\brepeat again\\b", RegexOption.IGNORE_CASE)) { "repeat" }
-        result = result.replace(Regex("\\breply back\\b", RegexOption.IGNORE_CASE)) { "reply" }
-        result = result.replace(Regex("\\bATM machine\\b", RegexOption.IGNORE_CASE)) { "ATM" }
-        result = result.replace(Regex("\\bPIN number\\b", RegexOption.IGNORE_CASE)) { "PIN" }
-        result = result.replace(Regex("\\bISBN number\\b", RegexOption.IGNORE_CASE)) { "ISBN" }
-
+        for ((regex, replacement) in redundancyPatterns) {
+            result = regex.replace(result, replacement)
+        }
         return result
     }
 
