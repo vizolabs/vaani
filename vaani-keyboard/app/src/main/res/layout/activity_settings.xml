@@ -60,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="28dp"
-            android:text="Keyboard Height"
+            android:text="@string/settings_keyboard_height_label"
             android:textColor="@color/vaani_text"
             android:textSize="15sp"
             android:fontFamily="sans-serif-medium" />
