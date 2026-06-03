@@ -36,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/setup_enable_return_hint"
+        android:text="@string/setup_switch_return_hint"
         android:textColor="@color/vaani_text_dim"
         android:textSize="12sp"
         android:gravity="center" />
