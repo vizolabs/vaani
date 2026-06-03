@@ -15,6 +15,7 @@ import com.vaani.keyboard.util.GrammarEngine
 import com.vaani.keyboard.util.PermissionHelper
 import com.vaani.keyboard.util.Prefs
 import com.vaani.keyboard.util.SpeechRecognizerHelper
+import com.vaani.keyboard.util.TranslateEngine
 import com.vaani.keyboard.util.Transliterator
 
 class VaaniKeyboardService : InputMethodService() {
@@ -26,8 +27,9 @@ class VaaniKeyboardService : InputMethodService() {
     private lateinit var prefs: Prefs
     private lateinit var previewHindi: TextView
     private lateinit var previewEnglish: TextView
+    private lateinit var previewHindiSym: TextView
+    private lateinit var previewEnglishSym: TextView
     private lateinit var shiftKey: Button
-    private lateinit var micKey: Button
     private lateinit var keyboardContainer: LinearLayout
     private lateinit var qwertyView: View
     private lateinit var symbolsView: View
@@ -88,6 +90,7 @@ class VaaniKeyboardService : InputMethodService() {
         when {
             locale?.startsWith("hi") == true -> prefs.selectedLanguage = "hi"
             locale?.startsWith("mr") == true -> prefs.selectedLanguage = "mr"
+            locale?.startsWith("en") == true -> prefs.selectedLanguage = "hinglish"
         }
     }
 
@@ -109,14 +112,16 @@ class VaaniKeyboardService : InputMethodService() {
 
         previewHindi = qwertyView.findViewById(R.id.tv_preview_hindi)
         previewEnglish = qwertyView.findViewById(R.id.tv_preview_english)
+        previewHindiSym = symbolsView.findViewById(R.id.tv_preview_hindi_sym)
+        previewEnglishSym = symbolsView.findViewById(R.id.tv_preview_english_sym)
         shiftKey = qwertyView.findViewById(R.id.key_shift)
-        micKey = qwertyView.findViewById(R.id.key_mic)
 
         setupSuggestionClicks(qwertyView, R.id.suggestion_1, R.id.suggestion_2, R.id.suggestion_3)
         setupSuggestionClicks(symbolsView, R.id.suggestion_sym_1, R.id.suggestion_sym_2, R.id.suggestion_sym_3)
 
         setupQwertyKeys(qwertyView)
         setupSymbolKeys(symbolsView)
+        updateLangKeyText()
 
         return keyboardContainer
     }
@@ -132,11 +137,19 @@ class VaaniKeyboardService : InputMethodService() {
     private fun commitSuggestion(index: Int) {
         if (index >= lastSuggestions.size) return
         val word = lastSuggestions[index]
-
         val ic = currentInputConnection ?: return
         val text = currentInput.toString()
         val lastSpace = text.lastIndexOf(' ')
         val prefixLen = if (lastSpace >= 0) text.length - lastSpace - 1 else text.length
+
+        val beforeCursor = ic.getTextBeforeCursor(prefixLen, 0)?.toString() ?: ""
+        if (beforeCursor.lowercase() != text.takeLast(prefixLen).lowercase()) {
+            currentInput.append("$word ")
+            commitText("$word ")
+            updatePreview()
+            return
+        }
+
         ic.deleteSurroundingText(prefixLen, 0)
         if (lastSpace >= 0) {
             currentInput.delete(currentInput.length - prefixLen, currentInput.length)
@@ -198,6 +211,7 @@ class VaaniKeyboardService : InputMethodService() {
         setKeyListener(root, R.id.key_m, "m"); setKeyListener(root, R.id.key_comma, ",")
         setKeyListener(root, R.id.key_dot, "."); setKeyListener(root, R.id.key_slash, "/")
         setKeyListener(root, R.id.key_symbol, "toggle_symbols")
+        setKeyListener(root, R.id.key_lang, "toggle_lang")
         setKeyListener(root, R.id.key_mic, "mic")
         setKeyListener(root, R.id.key_space, " ")
         setKeyListener(root, R.id.key_period, ".")
@@ -222,6 +236,7 @@ class VaaniKeyboardService : InputMethodService() {
         setKeyListener(root, R.id.key_tilde, "~"); setKeyListener(root, R.id.key_backtick, "`")
         setKeyListener(root, R.id.key_bksp_sym, "backspace")
         setKeyListener(root, R.id.key_abc, "toggle_symbols")
+        setKeyListener(root, R.id.key_lang_sym, "toggle_lang")
         setKeyListener(root, R.id.key_mic_sym, "mic")
         setKeyListener(root, R.id.key_space_sym, " ")
         setKeyListener(root, R.id.key_period_sym, ".")
@@ -243,6 +258,7 @@ class VaaniKeyboardService : InputMethodService() {
             "enter" -> handleEnter()
             "shift" -> handleShift()
             "toggle_symbols" -> toggleSymbols()
+            "toggle_lang" -> handleLangToggle()
             "mic" -> handleMic()
             "send" -> handleSend()
             " " -> handleSpace()
@@ -276,11 +292,9 @@ class VaaniKeyboardService : InputMethodService() {
         if (showSymbols) {
             qwertyView.visibility = View.GONE
             symbolsView.visibility = View.VISIBLE
-            micKey = symbolsView.findViewById(R.id.key_mic_sym)
         } else {
             symbolsView.visibility = View.GONE
             qwertyView.visibility = View.VISIBLE
-            micKey = qwertyView.findViewById(R.id.key_mic)
             updateShiftKeyAppearance()
             updateKeyLabels()
         }
@@ -289,7 +303,7 @@ class VaaniKeyboardService : InputMethodService() {
     private fun handleChar(c: String) {
         val char = if (isShifted || isCaps) c.uppercase() else c
         commitText(char)
-        currentInput.append(c)
+        currentInput.append(char)
         updatePreview()
         if (isShifted && !isCaps) {
             isShifted = false
@@ -332,6 +346,16 @@ class VaaniKeyboardService : InputMethodService() {
         updateKeyLabels()
     }
 
+    private fun handleLangToggle() {
+        prefs.selectedLanguage = when (prefs.selectedLanguage) {
+            "hi" -> "mr"
+            "mr" -> "hinglish"
+            else -> "hi"
+        }
+        updateLangKeyText()
+        updatePreview()
+    }
+
     private fun handleMic() {
         if (!PermissionHelper.hasRecordAudio(this)) {
             previewHindi.text = getString(R.string.perm_mic_denied_message)
@@ -364,7 +388,6 @@ class VaaniKeyboardService : InputMethodService() {
             onError = { error ->
                 previewHindi.text = getString(R.string.voice_error, error)
                 previewEnglish.text = ""
-                keyboardContainer.postDelayed({ updatePreview() }, 2000)
             }
         )
         speechHelper?.startListening(lang)
@@ -375,12 +398,13 @@ class VaaniKeyboardService : InputMethodService() {
         if (rawText.isEmpty()) return
         val ic = currentInputConnection ?: return
 
-        val cleaned = GrammarEngine.clean(rawText)
-        val transliterated = Transliterator.transliterate(cleaned)
+        val english = TranslateEngine.translate(rawText)
 
         ic.deleteSurroundingText(currentInput.length, 0)
-        ic.commitText(transliterated, 1)
+        ic.commitText(english, 1)
         currentInput.clear()
+        prefs.incrementTranslationCount()
+        prefs.markActive()
         updatePreview()
     }
 
@@ -424,11 +448,25 @@ class VaaniKeyboardService : InputMethodService() {
         }
     }
 
+    private fun updateLangKeyText() {
+        val label = when (prefs.selectedLanguage) {
+            "hi" -> "HI"
+            "mr" -> "MR"
+            else -> "EN"
+        }
+        qwertyView.findViewById<Button>(R.id.key_lang)?.text = label
+        symbolsView.findViewById<Button>(R.id.key_lang_sym)?.text = label
+    }
+
     private fun updatePreview() {
         val text = currentInput.toString().trim()
         if (text.isEmpty()) {
             previewHindi.text = ""
             previewEnglish.text = ""
+            if (::previewHindiSym.isInitialized) {
+                previewHindiSym.text = ""
+                previewEnglishSym.text = ""
+            }
             lastSuggestions = emptyList()
             updateSuggestions()
             return
@@ -436,11 +474,15 @@ class VaaniKeyboardService : InputMethodService() {
 
         val devanagari = Transliterator.transliterate(text)
         previewHindi.text = devanagari
+        if (::previewHindiSym.isInitialized) {
+            previewHindiSym.text = devanagari
+        }
 
-        val cleaned = GrammarEngine.clean(text)
-        val lastWord = cleaned.split(" ").lastOrNull() ?: ""
-        val translated = Transliterator.transliterate(lastWord)
-        previewEnglish.text = "→ $translated"
+        val english = TranslateEngine.translate(text)
+        previewEnglish.text = "→ $english"
+        if (::previewEnglishSym.isInitialized) {
+            previewEnglishSym.text = "→ $english"
+        }
 
         updateSuggestions()
     }
