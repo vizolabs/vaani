@@ -4,7 +4,6 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
-import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -28,17 +27,6 @@ abstract class BaseActivity : AppCompatActivity() {
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
             window.statusBarColor = Color.parseColor("#16161F")
             window.navigationBarColor = Color.parseColor("#16161F")
-        }
-    }
-
-    protected fun setStatusBarLightIcons(lightIcons: Boolean) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val vis = window.decorView.systemUiVisibility
-            window.decorView.systemUiVisibility = if (lightIcons) {
-                vis and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
-            } else {
-                vis or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-            }
         }
     }
 
