@@ -1586,7 +1586,7 @@ object TranslateEngine {
         put("sach mein", "really")
         put("sachchi", "really")
         put("jhooth", "lie")
-        put("pakka", "sure")
+        put("pakka", "sure, ripe")
         put("shayad", "maybe")
         put("zaroor", "definitely")
         put("ho sakta hai", "maybe")
@@ -2115,7 +2115,6 @@ object TranslateEngine {
         put("badam", "almond")
         put("akharot", "walnut")
         put("kachha", "raw")
-        put("pakka", "ripe")
         put("gehu", "wheat")
         put("jau", "barley")
 
