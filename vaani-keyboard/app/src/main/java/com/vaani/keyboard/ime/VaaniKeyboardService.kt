@@ -25,6 +25,7 @@ class VaaniKeyboardService : InputMethodService() {
     private var isCaps = false
     private var showSymbols = false
     private val currentInput = StringBuilder()
+    private var lastSpaceTime = 0L
     private lateinit var prefs: Prefs
     private lateinit var previewHindi: TextView
     private lateinit var previewEnglish: TextView
@@ -274,7 +275,9 @@ class VaaniKeyboardService : InputMethodService() {
     private fun setKeyListener(root: View, id: Int, value: String) {
         val key = root.findViewById<Button>(id) ?: return
         key.setOnClickListener {
-            key.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+            if (prefs.hapticEnabled) {
+                key.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+            }
             onKeyPressed(value)
         }
         key.setOnLongClickListener {
@@ -335,6 +338,11 @@ class VaaniKeyboardService : InputMethodService() {
         val char = if (isShifted || isCaps) c.uppercase() else c
         commitText(char)
         currentInput.append(char)
+        val autoSpace = char in listOf(".", "!", "?", ",", ";", ":")
+        if (autoSpace) {
+            commitText(" ")
+            currentInput.append(" ")
+        }
         updatePreview()
         if (isShifted && !isCaps) {
             isShifted = false
@@ -343,8 +351,19 @@ class VaaniKeyboardService : InputMethodService() {
     }
 
     private fun handleSpace() {
-        commitText(" ")
-        currentInput.append(" ")
+        val now = System.currentTimeMillis()
+        if (now - lastSpaceTime < 500) {
+            val ic = currentInputConnection ?: return
+            ic.deleteSurroundingText(1, 0)
+            if (currentInput.isNotEmpty()) currentInput.deleteCharAt(currentInput.length - 1)
+            commitText(". ")
+            currentInput.append(". ")
+            lastSpaceTime = 0L
+        } else {
+            commitText(" ")
+            currentInput.append(" ")
+        }
+        lastSpaceTime = now
         updatePreview()
     }
 

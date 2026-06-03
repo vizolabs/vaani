@@ -5,6 +5,7 @@ import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
 import com.vaani.keyboard.R
 
@@ -16,6 +17,7 @@ class SettingsActivity : BaseActivity() {
 
         setupLanguageButtons()
         setupKeyboardHeight()
+        setupHapticToggle()
     }
 
     private fun setupLanguageButtons() {
@@ -27,7 +29,7 @@ class SettingsActivity : BaseActivity() {
 
         highlightLang(btnHi, currentLang == "hi")
         highlightLang(btnMr, currentLang == "mr")
-        highlightLang(btnEn, currentLang == "en")
+        highlightLang(btnEn, currentLang == "hinglish")
 
         btnHi.setOnClickListener {
             prefs.selectedLanguage = "hi"
@@ -40,7 +42,7 @@ class SettingsActivity : BaseActivity() {
             showSaved()
         }
         btnEn.setOnClickListener {
-            prefs.selectedLanguage = "en"
+            prefs.selectedLanguage = "hinglish"
             highlightLang(btnHi, false); highlightLang(btnMr, false); highlightLang(btnEn, true)
             showSaved()
         }
@@ -70,6 +72,14 @@ class SettingsActivity : BaseActivity() {
             override fun onStartTrackingTouch(seek: SeekBar?) {}
             override fun onStopTrackingTouch(seek: SeekBar?) {}
         })
+    }
+
+    private fun setupHapticToggle() {
+        val switch = findViewById<SwitchCompat>(R.id.switch_haptic)
+        switch.isChecked = prefs.hapticEnabled
+        switch.setOnCheckedChangeListener { _, isChecked ->
+            prefs.hapticEnabled = isChecked
+        }
     }
 
     private fun showSaved() {

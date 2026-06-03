@@ -37,6 +37,10 @@ class Prefs(context: Context) {
         get() = prefs.getInt(KEY_KEYBOARD_HEIGHT, 100)
         set(value) = prefs.edit { putInt(KEY_KEYBOARD_HEIGHT, value) }
 
+    var hapticEnabled: Boolean
+        get() = prefs.getBoolean(KEY_HAPTIC, true)
+        set(value) = prefs.edit { putBoolean(KEY_HAPTIC, value) }
+
     fun clear() {
         prefs.edit { clear() }
     }
@@ -47,5 +51,6 @@ class Prefs(context: Context) {
         private const val KEY_TRANSLATION_COUNT = "translation_count"
         private const val KEY_LAST_ACTIVE = "last_active_timestamp"
         private const val KEY_KEYBOARD_HEIGHT = "keyboard_height"
+        private const val KEY_HAPTIC = "haptic_feedback"
     }
 }
