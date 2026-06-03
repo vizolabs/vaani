@@ -172,9 +172,7 @@ class VaaniKeyboardService : InputMethodService() {
 
         val beforeCursor = ic.getTextBeforeCursor(prefixLen, 0)?.toString() ?: ""
         if (beforeCursor.lowercase() != text.takeLast(prefixLen).lowercase()) {
-            currentInput.append("$word ")
-            commitText("$word ")
-            updatePreview()
+            commitWord(word)
             return
         }
 
@@ -186,6 +184,10 @@ class VaaniKeyboardService : InputMethodService() {
             currentInput.clear()
             currentInput.append(word)
         }
+        commitWord(word)
+    }
+
+    private fun commitWord(word: String) {
         currentInput.append(" ")
         commitText("$word ")
         updatePreview()
