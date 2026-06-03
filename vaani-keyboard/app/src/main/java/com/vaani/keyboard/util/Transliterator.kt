@@ -48,15 +48,8 @@ object Transliterator {
         put("ksha", "क्ष"); put("tra", "त्र"); put("gya", "ज्ञ")
         put("shra", "श्र")
 
-        // Matras (vowel signs after consonant)
-        put("a_", "ा"); put("i_", "ि"); put("ii_", "ी"); put("I_", "ी")
-        put("u_", "ु"); put("uu_", "ू"); put("U_", "ू")
-        put("e_", "े"); put("E_", "े")
-        put("o_", "ो"); put("O_", "ो")
-        put("ai_", "ै"); put("au_", "ौ")
-
-        // Standalone matras
-        put("aa", "ा"); put("ee", "ी"); put("oo", "ू")
+        // Matras (vowel signs after consonant — must not shadow vowel-only keys above)
+        put("ee", "ी"); put("oo", "ू")
 
         // Common Hindi words
         put("namaste", "नमस्ते"); put("dhanyavaad", "धन्यवाद")

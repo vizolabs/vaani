@@ -90,7 +90,7 @@ object TranslateEngine {
         put("chinta mat karo", "Don't worry")
         put("chinta na karo", "Don't worry")
         put("fikar mat karo", "Don't worry")
-        put(" tension mat lo", "Don't stress")
+        put("tension mat lo", "Don't stress")
         put("no problem", "No problem")
         put("its okay", "It is okay")
         put("theek hai", "Okay")

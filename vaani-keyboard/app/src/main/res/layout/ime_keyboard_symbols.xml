@@ -180,7 +180,7 @@
             android:layout_weight="2"
             android:text="Mic"
             android:textColor="@color/vaani_text_on_accent"
-            android:background="@drawable/key_bg_accent" />
+            android:background="@drawable/key_bg_accent_selector" />
 
         <Button
             android:id="@+id/key_space_sym"

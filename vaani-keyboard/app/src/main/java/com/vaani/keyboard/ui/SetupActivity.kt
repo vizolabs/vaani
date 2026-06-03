@@ -128,9 +128,9 @@ class SetupActivity : BaseActivity() {
             }
         }
         if (btnHinglish != null) {
-            highlightLang(btnHinglish, selectedLanguage == "en")
+            highlightLang(btnHinglish, selectedLanguage == "hinglish")
             btnHinglish.setOnClickListener {
-                selectedLanguage = "en"
+                selectedLanguage = "hinglish"
                 highlightLang(btnHindi, false)
                 highlightLang(btnMarathi, false)
                 highlightLang(btnHinglish, true)
