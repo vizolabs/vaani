@@ -37,6 +37,14 @@ class DashboardActivity : BaseActivity() {
             requestMicrophonePermission()
         }
 
+        val translationCount = findViewById<TextView>(R.id.tv_translation_count)
+        val count = prefs.translationCount
+        translationCount.text = if (count > 0) {
+            getString(R.string.dashboard_translations, count)
+        } else {
+            getString(R.string.dashboard_translations_none)
+        }
+
         findViewById<TextView>(R.id.tv_settings_link).setOnClickListener {
             Navigator.toSettings(this)
         }
@@ -57,10 +65,10 @@ class DashboardActivity : BaseActivity() {
     }
 
     private fun getColorAccent(): Int {
-        return ContextCompat.getColor(this, R.color.vaani_green)
+        return ContextCompat.getColor(this, R.color.vaani_accent)
     }
 
     private fun getColorMuted(): Int {
-        return ContextCompat.getColor(this, R.color.vaani_accent)
+        return ContextCompat.getColor(this, R.color.vaani_text_muted)
     }
 }
