@@ -1,12 +1,12 @@
 package com.vaani.keyboard.ui
 
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.vaani.keyboard.R
 import com.vaani.keyboard.util.PermissionHelper
 import com.vaani.keyboard.util.Prefs
@@ -25,8 +25,8 @@ abstract class BaseActivity : AppCompatActivity() {
     private fun setupStatusBar() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-            window.statusBarColor = Color.parseColor("#16161F")
-            window.navigationBarColor = Color.parseColor("#16161F")
+            window.statusBarColor = ContextCompat.getColor(this, R.color.vaani_dark)
+            window.navigationBarColor = ContextCompat.getColor(this, R.color.vaani_dark)
         }
     }
 
