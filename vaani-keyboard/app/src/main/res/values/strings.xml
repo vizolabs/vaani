@@ -32,6 +32,7 @@
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>
+    <string name="settings_keyboard_height_label">Keyboard Height</string>
     <string name="settings_language_label">Input Language</string>
     <string name="settings_about_label">About Vaani</string>
     <string name="settings_about_text">Vaani converts your native language text and voice into grammatically correct English. Everything runs entirely on your device — no internet needed, no data leaves your phone.\n\nVersion 1.0.0</string>
