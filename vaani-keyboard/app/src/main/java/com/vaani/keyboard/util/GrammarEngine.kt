@@ -58,8 +58,6 @@ object GrammarEngine {
         arrayOf(Regex("\\bhe don't\\b", RegexOption.IGNORE_CASE), "he doesn't"),
         arrayOf(Regex("\\bshe don't\\b", RegexOption.IGNORE_CASE), "she doesn't"),
         arrayOf(Regex("\\bit don't\\b", RegexOption.IGNORE_CASE), "it doesn't"),
-        arrayOf(Regex("\\bhe doesn't\\b", RegexOption.IGNORE_CASE), "he doesn't"),
-
         arrayOf(Regex("\\bhe go\\b", RegexOption.IGNORE_CASE), "he goes"),
         arrayOf(Regex("\\bshe go\\b", RegexOption.IGNORE_CASE), "she goes"),
         arrayOf(Regex("\\bit go\\b", RegexOption.IGNORE_CASE), "it goes"),
