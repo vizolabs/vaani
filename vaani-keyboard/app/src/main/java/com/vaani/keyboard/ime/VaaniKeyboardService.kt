@@ -265,9 +265,8 @@ class VaaniKeyboardService : InputMethodService() {
 
     private fun applyKeyboardHeight() {
         val percent = prefs.keyboardHeightPercent
-        val baseDp = 34f
-        val targetDp = baseDp * percent / 100f
-        val targetPx = (targetDp * resources.displayMetrics.density).toInt()
+        val basePx = resources.getDimension(R.dimen.kb_key_height)
+        val targetPx = (basePx * percent / 100f).toInt()
         for (row in keyboardRows) {
             if (row != null) {
                 row.layoutParams.height = targetPx
