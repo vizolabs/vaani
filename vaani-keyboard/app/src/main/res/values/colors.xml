@@ -32,6 +32,7 @@
     <color name="kb_key_text">#E8E4DC</color>
     <color name="kb_key_text_muted">#8A8595</color>
     <color name="kb_preview_bg">#1A1A30</color>
+    <color name="kb_preview_stroke">#2A2A40</color>
     <color name="kb_preview_text">#C0B8D0</color>
     <color name="kb_preview_english">#F0ECE4</color>
 
