@@ -3,7 +3,6 @@ package com.vaani.keyboard.translate
 import android.content.Context
 import android.util.Log
 import com.vaani.keyboard.util.ModelLoader
-import java.io.File
 
 class TranslationPipeline(private val context: Context) {
 
