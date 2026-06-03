@@ -66,6 +66,11 @@
     <string name="kb_symbol_toggle">12#</string>
     <string name="kb_abc_toggle">ABC</string>
 
+    <!-- Language toggle labels -->
+    <string name="lang_label_hi">HI</string>
+    <string name="lang_label_mr">MR</string>
+    <string name="lang_label_en">EN</string>
+
     <!-- Dashboard Stats -->
     <string name="dashboard_translations">Translations made: %d</string>
     <string name="dashboard_translations_none">No translations yet. Start typing!</string>
