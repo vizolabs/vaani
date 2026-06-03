@@ -23,18 +23,15 @@
 
         <activity
             android:name=".ui.SetupActivity"
-            android:exported="false"
-            android:parentActivityName=".ui.SplashActivity" />
+            android:exported="false" />
 
         <activity
             android:name=".ui.DashboardActivity"
-            android:exported="false"
-            android:parentActivityName=".ui.SplashActivity" />
+            android:exported="false" />
 
         <activity
             android:name=".ui.SettingsActivity"
-            android:exported="false"
-            android:parentActivityName=".ui.SplashActivity" />
+            android:exported="false" />
 
         <service
             android:name=".ime.VaaniKeyboardService"
