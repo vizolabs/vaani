@@ -3,7 +3,6 @@ package com.vaani.keyboard.ime
 import android.inputmethodservice.InputMethodService
 import android.media.AudioManager
 import android.view.HapticFeedbackConstants
-import android.view.SoundEffectConstants
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
