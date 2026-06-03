@@ -4,6 +4,8 @@
         <item name="colorPrimary">@color/vaani_accent</item>
         <item name="colorPrimaryDark">@color/vaani_dark</item>
         <item name="colorAccent">@color/vaani_accent</item>
+        <item name="colorControlNormal">@color/vaani_text_muted</item>
+        <item name="colorControlActivated">@color/vaani_accent</item>
         <item name="android:windowBackground">@color/vaani_dark</item>
         <item name="android:statusBarColor">@color/vaani_dark</item>
         <item name="android:navigationBarColor">@color/vaani_dark</item>
