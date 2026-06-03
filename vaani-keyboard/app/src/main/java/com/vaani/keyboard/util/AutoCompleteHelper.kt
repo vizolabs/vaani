@@ -46,7 +46,7 @@ object AutoCompleteHelper {
         "try", "attempt", "manage", "succeed", "fail", "work", "function", "operate", "run", "use",
         "arrive", "leave", "enter", "reach", "return", "visit", "travel", "move", "stay", "live",
         "talk", "speak", "say", "tell", "discuss", "explain", "describe", "mention", "suggest", "recommend"
-    )
+    ).distinct()
 
     fun suggestions(prefix: String, max: Int = 3): List<String> {
         val lower = prefix.lowercase()
