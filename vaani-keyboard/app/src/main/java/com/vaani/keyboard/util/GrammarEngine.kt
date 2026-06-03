@@ -43,10 +43,14 @@ object GrammarEngine {
         "cud" to "could", "shud" to "should", "wud" to "would",
     )
 
+    private val contractionPatterns = contractions.map { (short, long) ->
+        Regex("\\b$short\\b", RegexOption.IGNORE_CASE) to long
+    }
+
     private fun expandContractions(text: String): String {
         var result = text
-        for ((shortForm, longForm) in contractions) {
-            result = result.replace(Regex("\\b$shortForm\\b", RegexOption.IGNORE_CASE)) {
+        for ((regex, longForm) in contractionPatterns) {
+            result = result.replace(regex) {
                 if (it.value[0].isUpperCase()) longForm.replaceFirstChar { c -> c.uppercase() }
                 else longForm
             }
@@ -136,10 +140,14 @@ object GrammarEngine {
         "sign up" to "signup", "log in" to "login", "set up" to "setup",
     )
 
+    private val commonSwapPatterns = commonSwaps.map { (wrong, right) ->
+        Regex("\\b$wrong\\b", RegexOption.IGNORE_CASE) to right
+    }
+
     private fun fixCommonSwaps(text: String): String {
         var result = text
-        for ((wrong, right) in commonSwaps) {
-            result = result.replace(Regex("\\b$wrong\\b", RegexOption.IGNORE_CASE)) {
+        for ((regex, right) in commonSwapPatterns) {
+            result = result.replace(regex) {
                 if (it.value[0].isUpperCase()) right.replaceFirstChar { c -> c.uppercase() }
                 else right
             }
