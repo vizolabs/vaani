@@ -82,6 +82,14 @@ class VaaniKeyboardService : InputMethodService() {
         prefs = Prefs(this)
     }
 
+    override fun onStartInput(info: EditorInfo?, restarting: Boolean) {
+        super.onStartInput(info, restarting)
+        currentInput.clear()
+        lastSpaceTime = 0L
+        isShifted = false
+        isCaps = false
+    }
+
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
         super.onStartInputView(info, restarting)
         detectSubtypeLanguage()
