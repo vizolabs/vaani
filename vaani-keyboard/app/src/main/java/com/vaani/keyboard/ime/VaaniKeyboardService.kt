@@ -38,6 +38,8 @@ class VaaniKeyboardService : InputMethodService() {
     private lateinit var symbolsView: View
     private var speechHelper: SpeechRecognizerHelper? = null
     private val keyboardRows = mutableListOf<View>()
+    private val suggestionViews = mutableListOf<TextView>()
+    private val suggestionSymViews = mutableListOf<TextView>()
     private val sentenceEndChars = setOf(".", "!", "?")
     private val autoSpaceChars = setOf(".", "!", "?", ",", ";", ":")
     private val doubleSpaceMs = 500L
@@ -131,6 +133,19 @@ class VaaniKeyboardService : InputMethodService() {
         previewEnglishSym = symbolsView.findViewById(R.id.tv_preview_english_sym)
         shiftKey = qwertyView.findViewById(R.id.key_shift)
 
+        suggestionViews.clear()
+        suggestionViews.addAll(listOf(
+            qwertyView.findViewById(R.id.suggestion_1),
+            qwertyView.findViewById(R.id.suggestion_2),
+            qwertyView.findViewById(R.id.suggestion_3),
+        ))
+        suggestionSymViews.clear()
+        suggestionSymViews.addAll(listOf(
+            symbolsView.findViewById(R.id.suggestion_sym_1),
+            symbolsView.findViewById(R.id.suggestion_sym_2),
+            symbolsView.findViewById(R.id.suggestion_sym_3),
+        ))
+
         setupSuggestionClicks(qwertyView, R.id.suggestion_1, R.id.suggestion_2, R.id.suggestion_3)
         setupSuggestionClicks(symbolsView, R.id.suggestion_sym_1, R.id.suggestion_sym_2, R.id.suggestion_sym_3)
 
@@ -204,21 +219,11 @@ class VaaniKeyboardService : InputMethodService() {
         }
 
         lastSuggestions = suggestions
-        val qwertySuggestions = listOf(
-            qwertyView.findViewById<TextView>(R.id.suggestion_1),
-            qwertyView.findViewById<TextView>(R.id.suggestion_2),
-            qwertyView.findViewById<TextView>(R.id.suggestion_3),
-        )
-        val symSuggestions = listOf(
-            symbolsView.findViewById<TextView>(R.id.suggestion_sym_1),
-            symbolsView.findViewById<TextView>(R.id.suggestion_sym_2),
-            symbolsView.findViewById<TextView>(R.id.suggestion_sym_3),
-        )
 
         for (i in 0 until 3) {
             val text = suggestions.getOrNull(i) ?: ""
-            qwertySuggestions[i].apply { this.text = text; visibility = if (text.isEmpty()) View.INVISIBLE else View.VISIBLE }
-            symSuggestions[i].apply { this.text = text; visibility = if (text.isEmpty()) View.INVISIBLE else View.VISIBLE }
+            suggestionViews[i].apply { this.text = text; visibility = if (text.isEmpty()) View.INVISIBLE else View.VISIBLE }
+            suggestionSymViews[i].apply { this.text = text; visibility = if (text.isEmpty()) View.INVISIBLE else View.VISIBLE }
         }
     }
 
