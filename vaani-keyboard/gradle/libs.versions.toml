@@ -2,7 +2,8 @@
 agp = "8.2.0"
 kotlin = "1.9.22"
 coroutines = "1.7.3"
-onnxruntime = "1.16.0"
+onnxruntime = "1.20.0"
+sentencepiece = "0.34.0"
 appcompat = "1.6.1"
 material = "1.11.0"
 junit = "4.13.2"
@@ -15,6 +16,7 @@ androidx-material = { group = "com.google.android.material", name = "material", 
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 onnxruntime-android = { group = "com.microsoft.onnxruntime", name = "onnxruntime-android", version.ref = "onnxruntime" }
+sentencepiece = { group = "ai.djl.sentencepiece", name = "sentencepiece", version.ref = "sentencepiece" }
 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "test-ext-junit" }

@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.androidx.material)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.onnxruntime.android)
+    implementation(libs.sentencepiece)
 
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.junit)
