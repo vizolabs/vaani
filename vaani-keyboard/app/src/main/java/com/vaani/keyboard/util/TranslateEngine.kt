@@ -541,7 +541,6 @@ object TranslateEngine {
         put("sabko badhai", "Congratulations to everyone")
 
         // ─── Short Replies ───
-        put("achha", "Okay")
         put("achha hai", "That is good")
         put("achha kiya", "Well done")
         put("sahi hai", "That is right")
@@ -724,7 +723,6 @@ object TranslateEngine {
         put("main drawing bana rahi hoon", "I am drawing")
 
         // ─── Progressive with other subjects ───
-        put("aap kya kar rahe hain", "What are you doing")
         put("tum kya kar rahe ho", "What are you doing")
         put("woh kya kar raha hai", "What is he doing")
         put("woh kya kar rahi hai", "What is she doing")
@@ -1369,9 +1367,6 @@ object TranslateEngine {
         put("unke", "their")
         put("unko", "them")
         put("unhone", "they")
-        put("unka", "their")
-        put("unke", "their")
-        put("unki", "their")
 
         put("ye", "this")
         put("yah", "this")
@@ -1622,7 +1617,6 @@ object TranslateEngine {
         put("kya", "what")
         put("kaun", "who")
         put("kab", "when")
-        put("kahan", "where")
         put("kyon", "why")
         put("kyun", "why")
         put("kaise", "how")
@@ -1665,7 +1659,6 @@ object TranslateEngine {
         put("mushkil", "difficult")
         put("sasta", "cheap")
         put("mehnga", "expensive")
-        put("achha", "good")
         put("behatar", "better")
         put("sabse achha", "best")
         put("tez", "fast")
@@ -1691,7 +1684,6 @@ object TranslateEngine {
         put("ladki", "girl")
         put("admi", "man")
         put("aurat", "woman")
-        put("log", "people")
         put("insaan", "human")
         put("vyakti", "person")
         put("buzurg", "elderly")
@@ -1823,8 +1815,6 @@ object TranslateEngine {
         put("bhabhi", "sister in law")
         put("beta", "son")
         put("beti", "daughter")
-        put("pati", "husband")
-        put("patni", "wife")
         put("biwi", "wife")
         put("saas", "mother in law")
         put("sasur", "father in law")
@@ -1834,9 +1824,7 @@ object TranslateEngine {
         put("betiyan", "daughters")
         put("dono", "both")
         put("sabhi", "everyone")
-        put("kisi", "someone")
         put("kisi ko", "to someone")
-        put("kisi ka", "someone's")
         put("apne", "our own")
         put("khud", "self")
         put("khud se", "by self")
@@ -1844,10 +1832,7 @@ object TranslateEngine {
 
         // ─── Common Places ───
         put("ghar", "home")
-        put("school", "school")
-        put("college", "college")
         put("office", "office")
-        put("hospital", "hospital")
         put("bank", "bank")
         put("station", "station")
         put("airport", "airport")
@@ -1950,18 +1935,8 @@ object TranslateEngine {
         put("taza", "fresh")
 
         // ─── More Verbs ───
-        put("aana", "come")
-        put("jaana", "go")
-        put("karna", "do")
-        put("khana", "eat")
-        put("peena", "drink")
         put("padhna", "study")
         put("likhna", "write")
-        put("bolna", "speak")
-        put("kehna", "say")
-        put("samajhna", "understand")
-        put("dekhna", "see")
-        put("sunna", "listen")
         put("sona", "sleep")
         put("uthna", "wake")
         put("baithna", "sit")
@@ -1974,7 +1949,6 @@ object TranslateEngine {
         put("gana", "sing")
         put("pakana", "cook")
         put("pakaana", "cook")
-        put("dhona", "wash")
         put("saf kar", "clean")
         put("saf karna", "clean")
         put("jhadoo", "sweep")
@@ -1985,16 +1959,10 @@ object TranslateEngine {
         put("mudna", "turn")
         put("ghoomna", "roam")
         put("milna", "meet")
-        put("bhejna", "send")
-        put("lena", "take")
-        put("dena", "give")
         put("rakhna", "keep")
-        put("laana", "bring")
         put("bulaana", "call")
         put("pukarna", "call")
         put("puchhna", "ask")
-        put("puchna", "ask")
-        put("batana", "tell")
         put("dikhaana", "show")
         put("dikhana", "show")
         put("samjhana", "explain")
@@ -2030,9 +1998,7 @@ object TranslateEngine {
 
         // ─── Body Parts ───
         put("sar", "head")
-        put("sir", "head")
         put("baal", "hair")
-        put("aankh", "eye")
         put("aankhen", "eyes")
         put("naak", "nose")
         put("kann", "ear")
@@ -2049,39 +2015,25 @@ object TranslateEngine {
         put("kandhe", "shoulders")
         put("baazoo", "arm")
         put("baahe", "arms")
-        put("haath", "hand")
         put("hath", "hand")
         put("hathon", "hands")
         put("ungli", "finger")
         put("ungliyan", "fingers")
         put("nakhun", "nail")
         put("chhaati", "chest")
-        put("pet", "stomach")
         put("pith", "back")
         put("kamar", "waist")
         put("tung", "leg")
         put("tang", "leg")
-        put("pair", "foot")
         put("pairo", "feet")
         put("ghutna", "knee")
         put("ghutne", "knees")
         put("edhi", "heel")
 
         // ─── Food Items ───
-        put("chawal", "rice")
-        put("roti", "bread")
-        put("dal", "lentils")
-        put("sabzi", "vegetables")
         put("salad", "salad")
         put("dahi", "yogurt")
-        put("doodh", "milk")
-        put("chai", "tea")
-        put("coffee", "coffee")
         put("juice", "juice")
-        put("paani", "water")
-        put("namak", "salt")
-        put("chini", "sugar")
-        put("shakkar", "sugar")
         put("mirchi", "chili")
         put("haldi", "turmeric")
         put("dhaniya", "coriander")
@@ -2094,13 +2046,9 @@ object TranslateEngine {
         put("aata", "flour")
         put("maida", "white flour")
         put("sooji", "semolina")
-        put("tel", "oil")
         put("ghee", "ghee")
         put("makkhan", "butter")
         put("paneer", "paneer")
-        put("anda", "egg")
-        put("murgi", "chicken")
-        put("machhli", "fish")
         put("gosht", "meat")
         put("kela", "banana")
         put("seb", "apple")
@@ -2136,8 +2084,6 @@ object TranslateEngine {
         put("chahti hoon", "I want")
         put("chahte hain", "we want")
         put("mujhe chahiye", "I want")
-        put("mujhe", "I")
-        put("mujhko", "me")
 
         // ─── Past Tense: hua/hui/huye (happen) ───
         put("hua", "happened")
@@ -2166,10 +2112,8 @@ object TranslateEngine {
         put("sochte", "think")
 
         // ─── Past Tense: rakha (kept) ───
-        put("rakha", "kept")
         put("rakhi", "kept")
         put("rakhe", "kept")
-        put("rakh", "keep")
 
         // ─── Past Tense: padha (studied/read) ───
         put("padha", "studied")
@@ -2202,7 +2146,6 @@ object TranslateEngine {
         put("baithe", "sat")
         put("baith", "sit")
         put("baitho", "sit")
-        put("baithna", "sit")
         put("baithke", "sitting")
 
         // ─── Past Tense: khada (stood) ───
@@ -2213,14 +2156,12 @@ object TranslateEngine {
         put("kharhi", "stood")
         put("kharhe", "stood")
         put("kharha hona", "stand")
-        put("khade hona", "stand")
 
         // ─── Past Tense: chala (walked/left) ───
         put("chala", "left")
         put("chali", "left")
         put("chale", "left")
         put("chal", "walk")
-        put("chalo", "let's go")
         put("chalte", "walk")
         put("chalti", "walks")
 
@@ -2230,7 +2171,6 @@ object TranslateEngine {
         put("soye", "slept")
         put("so", "sleep")
         put("soo", "sleep")
-        put("sona", "sleep")
         put("sota", "sleeps")
         put("soti", "sleeps")
         put("sote", "sleep")
@@ -2254,22 +2194,10 @@ object TranslateEngine {
         put("hasta", "laughs")
 
         // ─── Past Tense: gaya/gayi/gaye (went) - additional forms ───
-        put("gaya", "went")
-        put("gayi", "went")
-        put("gaye", "went")
-        put("ja", "go")
-        put("jaa", "go")
-        put("jao", "go")
-        put("jata", "goes")
         put("jati", "goes")
         put("jate", "go")
 
         // ─── Past Tense: aaya (came) - additional forms ───
-        put("aaya", "came")
-        put("aayi", "came")
-        put("aaye", "came")
-        put("aa", "come")
-        put("aao", "come")
 
         // ─── Emotions ───
         put("khushi", "happy")
@@ -2306,29 +2234,16 @@ object TranslateEngine {
         put("tandurust", "healthy")
         put("thik", "fine")
         put("theek", "fine")
-        put("achha", "good")
         put("behtar", "better")
-        put("kharab", "bad")
         put("buri tarah", "badly")
         put("aaram", "rest")
         put("aaram karna", "rest")
 
         // ─── Perception / Cognition ───
-        put("yaad", "remember")
-        put("yaad hai", "remember")
         put("yaad aaya", "remembered")
-        put("bhool", "forget")
         put("bhul", "forget")
-        put("bhool gaya", "forgot")
-        put("bhool gayi", "forgot")
-        put("samajh", "understand")
         put("samajh aaya", "understood")
-        put("samajh mein aaya", "understood")
         put("pata", "know")
-        put("pata hai", "know")
-        put("pata nahi", "do not know")
-        put("malum", "known")
-        put("malum hai", "know")
 
         // ─── Communication ───
         put("khabar", "news")
@@ -2342,7 +2257,6 @@ object TranslateEngine {
         put("baatcheet", "conversation")
         put("shor", "noise")
         put("khamoshi", "silence")
-        put("chup", "quiet")
 
         // ─── Time ───
         put("shuru", "start")
@@ -2358,8 +2272,6 @@ object TranslateEngine {
         put("vaada", "promise")
 
         // ─── Quality / Quantity ───
-        put("aasan", "easy")
-        put("mushkil", "difficult")
         put("kathin", "hard")
         put("safal", "successful")
         put("kaamyab", "successful")
@@ -2391,7 +2303,6 @@ object TranslateEngine {
         put("hawaa", "air")
         put("hawa", "air")
         put("aag", "fire")
-        put("aankh", "eye")
     }
 
     private val knownVerbs = setOf(
