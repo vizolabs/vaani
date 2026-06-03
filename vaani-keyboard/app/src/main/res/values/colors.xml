@@ -10,6 +10,7 @@
     <color name="vaani_surface">#1A1A2A</color>
     <color name="vaani_surface_card">#1E1E2E</color>
     <color name="vaani_surface_elevated">#242438</color>
+    <color name="vaani_surface_stroke">#2A2A3A</color>
     <color name="vaani_light">#F5F0E8</color>
 
     <!-- Text -->
