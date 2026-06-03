@@ -504,8 +504,8 @@ class VaaniKeyboardService : InputMethodService() {
     private fun updateKeyLabels() {
         for (id in letterKeyIds) {
             val btn = qwertyView.findViewById<Button>(id) ?: continue
-            val original = btn.text.toString()
-            btn.text = if (isCaps || isShifted) original.uppercase() else original.lowercase()
+            val lower = btn.text.toString().first().lowercaseChar().toString()
+            btn.text = if (isCaps || isShifted) lower.uppercase() else lower
         }
     }
 
