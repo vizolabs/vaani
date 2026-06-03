@@ -402,6 +402,7 @@ class VaaniKeyboardService : InputMethodService() {
         val lang = when (prefs.selectedLanguage) {
             "hi" -> "hi-IN"
             "mr" -> "mr-IN"
+            "hinglish" -> "en-IN"
             else -> "hi-IN"
         }
 

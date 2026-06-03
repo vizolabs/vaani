@@ -1212,6 +1212,97 @@ object TranslateEngine {
         Regex("^kahan (.+) hai$", RegexOption.IGNORE_CASE) to { m ->
             "Where is the ${m.groupValues[1]}"
         },
+
+        // "kya aap {X} sakte hain" → "Can you {X}"
+        Regex("^kya aap (.+) sakte hain$", RegexOption.IGNORE_CASE) to { m ->
+            "Can you ${m.groupValues[1]}"
+        },
+        // "kya aap {X} sakti hain" → "Can you {X}"
+        Regex("^kya aap (.+) sakti hain$", RegexOption.IGNORE_CASE) to { m ->
+            "Can you ${m.groupValues[1]}"
+        },
+        // "kya tum {X} sakte ho" → "Can you {X}"
+        Regex("^kya tum (.+) sakte ho$", RegexOption.IGNORE_CASE) to { m ->
+            "Can you ${m.groupValues[1]}"
+        },
+
+        // "main {X} kar sakta hoon" → "I can {X}"
+        Regex("^main ([a-z]+) kar sakta hoon$", RegexOption.IGNORE_CASE) to { m ->
+            "I can ${m.groupValues[1]}"
+        },
+        // "main {X} kar sakti hoon" → "I can {X}"
+        Regex("^main ([a-z]+) kar sakti hoon$", RegexOption.IGNORE_CASE) to { m ->
+            "I can ${m.groupValues[1]}"
+        },
+        // "aap {X} kar sakte hain" → "You can {X}"
+        Regex("^aap ([a-z]+) kar sakte hain$", RegexOption.IGNORE_CASE) to { m ->
+            "You can ${m.groupValues[1]}"
+        },
+        // "tum {X} kar sakte ho" → "You can {X}"
+        Regex("^tum ([a-z]+) kar sakte ho$", RegexOption.IGNORE_CASE) to { m ->
+            "You can ${m.groupValues[1]}"
+        },
+
+        // "{X} khatam ho gaya" → "{X} is finished"
+        Regex("^(.+) khatam ho gaya$", RegexOption.IGNORE_CASE) to { m ->
+            "${m.groupValues[1]} is finished"
+        },
+        // "{X} khatam ho gayi" → "{X} is finished"
+        Regex("^(.+) khatam ho gayi$", RegexOption.IGNORE_CASE) to { m ->
+            "${m.groupValues[1]} is finished"
+        },
+        // "{X} shuru ho gaya" → "{X} has started"
+        Regex("^(.+) shuru ho gaya$", RegexOption.IGNORE_CASE) to { m ->
+            "${m.groupValues[1]} has started"
+        },
+        // "{X} shuru ho gayi" → "{X} has started"
+        Regex("^(.+) shuru ho gayi$", RegexOption.IGNORE_CASE) to { m ->
+            "${m.groupValues[1]} has started"
+        },
+
+        // "maine {X} kiya" → "I did {X}"
+        Regex("^maine (.+) kiya$", RegexOption.IGNORE_CASE) to { m ->
+            "I did ${m.groupValues[1]}"
+        },
+        // "kya aapne {X} dekha" → "Did you see {X}"
+        Regex("^kya aapne (.+) dekha$", RegexOption.IGNORE_CASE) to { m ->
+            "Did you see ${m.groupValues[1]}"
+        },
+        // "kya aapne {X} suna" → "Did you hear {X}"
+        Regex("^kya aapne (.+) suna$", RegexOption.IGNORE_CASE) to { m ->
+            "Did you hear ${m.groupValues[1]}"
+        },
+
+        // "mujhe {X} ka darr hai" → "I am afraid of {X}"
+        Regex("^mujhe (.+) ka darr hai$", RegexOption.IGNORE_CASE) to { m ->
+            "I am afraid of ${m.groupValues[1]}"
+        },
+        // "mujhe {X} pyaar hai" → "I love {X}"
+        Regex("^mujhe (.+) pyaar hai$", RegexOption.IGNORE_CASE) to { m ->
+            "I love ${m.groupValues[1]}"
+        },
+        // "mujhe {X} se nafrat hai" → "I hate {X}"
+        Regex("^mujhe (.+) se nafrat hai$", RegexOption.IGNORE_CASE) to { m ->
+            "I hate ${m.groupValues[1]}"
+        },
+
+        // "{X} ka kya hua" → "What happened to {X}"
+        Regex("^(.+) ka kya hua$", RegexOption.IGNORE_CASE) to { m ->
+            "What happened to ${m.groupValues[1]}"
+        },
+        // "{X} ki kya hui" → "What happened to {X}"
+        Regex("^(.+) ki kya hui$", RegexOption.IGNORE_CASE) to { m ->
+            "What happened to ${m.groupValues[1]}"
+        },
+
+        // "mujhe nahi pata" → "I don't know"
+        Regex("^mujhe nahi pata$", RegexOption.IGNORE_CASE) to { m ->
+            "I do not know"
+        },
+        // "mujhe nahi malum" → "I don't know"
+        Regex("^mujhe nahi malum$", RegexOption.IGNORE_CASE) to { m ->
+            "I do not know"
+        },
     )
 
     private val wordDictionary: Map<String, String> = buildMap {
@@ -2030,6 +2121,281 @@ object TranslateEngine {
         put("pakka", "ripe")
         put("gehu", "wheat")
         put("jau", "barley")
+
+        // ─── Ability Modals ───
+        put("sakta", "can")
+        put("sakti", "can")
+        put("sakte", "can")
+        put("sakta hai", "can")
+        put("sakti hai", "can")
+        put("sakte hain", "can")
+        put("sakta hoon", "can")
+
+        // ─── Desire / Need ───
+        put("chahiye", "want")
+        put("chahta", "want")
+        put("chahti", "want")
+        put("chahte", "want")
+        put("chahta hoon", "I want")
+        put("chahti hoon", "I want")
+        put("chahte hain", "we want")
+        put("mujhe chahiye", "I want")
+        put("mujhe", "I")
+        put("mujhko", "me")
+
+        // ─── Past Tense: hua/hui/huye (happen) ───
+        put("hua", "happened")
+        put("hui", "happened")
+        put("huye", "happened")
+        put("ho", "happen")
+        put("hota", "happens")
+        put("hoti", "happens")
+        put("hote", "happen")
+
+        // ─── Past Tense: mila/mili/mile (got/met) ───
+        put("mila", "got")
+        put("mili", "got")
+        put("mile", "got")
+        put("mil", "get")
+        put("milna", "get")
+        put("milo", "meet")
+        put("milte", "meet")
+
+        // ─── Past Tense: socha (thought) ───
+        put("socha", "thought")
+        put("sochi", "thought")
+        put("soche", "thought")
+        put("soch", "think")
+        put("socho", "think")
+        put("sochte", "think")
+
+        // ─── Past Tense: rakha (kept) ───
+        put("rakha", "kept")
+        put("rakhi", "kept")
+        put("rakhe", "kept")
+        put("rakh", "keep")
+
+        // ─── Past Tense: padha (studied/read) ───
+        put("padha", "studied")
+        put("padhi", "studied")
+        put("padhe", "studied")
+        put("padh", "study")
+        put("padho", "study")
+        put("padhte", "study")
+        put("padhti", "studies")
+
+        // ─── Past Tense: likha (wrote) ───
+        put("likha", "wrote")
+        put("likhi", "wrote")
+        put("likhe", "wrote")
+        put("likh", "write")
+        put("likho", "write")
+        put("likhte", "write")
+        put("likhti", "writes")
+
+        // ─── Past Tense: utha (woke/got up) ───
+        put("utha", "woke up")
+        put("uthi", "woke up")
+        put("uthe", "woke up")
+        put("uth", "wake up")
+        put("utho", "wake up")
+
+        // ─── Past Tense: baitha (sat) ───
+        put("baitha", "sat")
+        put("baithi", "sat")
+        put("baithe", "sat")
+        put("baith", "sit")
+        put("baitho", "sit")
+        put("baithna", "sit")
+        put("baithke", "sitting")
+
+        // ─── Past Tense: khada (stood) ───
+        put("khada", "stood")
+        put("khadi", "stood")
+        put("khade", "stood")
+        put("kharha", "stood")
+        put("kharhi", "stood")
+        put("kharhe", "stood")
+        put("kharha hona", "stand")
+        put("khade hona", "stand")
+
+        // ─── Past Tense: chala (walked/left) ───
+        put("chala", "left")
+        put("chali", "left")
+        put("chale", "left")
+        put("chal", "walk")
+        put("chalo", "let's go")
+        put("chalte", "walk")
+        put("chalti", "walks")
+
+        // ─── Past Tense: soya (slept) ───
+        put("soya", "slept")
+        put("soyi", "slept")
+        put("soye", "slept")
+        put("so", "sleep")
+        put("soo", "sleep")
+        put("sona", "sleep")
+        put("sota", "sleeps")
+        put("soti", "sleeps")
+        put("sote", "sleep")
+
+        // ─── Past Tense: roya (cried) ───
+        put("roya", "cried")
+        put("royi", "cried")
+        put("roye", "cried")
+        put("ro", "cry")
+        put("rona", "cry")
+        put("rota", "cries")
+
+        // ─── Past Tense: hasa (laughed) ───
+        put("hasa", "laughed")
+        put("hasi", "laughed")
+        put("hase", "laughed")
+        put("has", "laugh")
+        put("haso", "laugh")
+        put("hans", "laugh")
+        put("hansna", "laugh")
+        put("hasta", "laughs")
+
+        // ─── Past Tense: gaya/gayi/gaye (went) - additional forms ───
+        put("gaya", "went")
+        put("gayi", "went")
+        put("gaye", "went")
+        put("ja", "go")
+        put("jaa", "go")
+        put("jao", "go")
+        put("jata", "goes")
+        put("jati", "goes")
+        put("jate", "go")
+
+        // ─── Past Tense: aaya (came) - additional forms ───
+        put("aaya", "came")
+        put("aayi", "came")
+        put("aaye", "came")
+        put("aa", "come")
+        put("aao", "come")
+
+        // ─── Emotions ───
+        put("khushi", "happy")
+        put("khush", "happy")
+        put("dukhi", "sad")
+        put("dukh", "sadness")
+        put("gussa", "angry")
+        put("gusse", "anger")
+        put("naraz", "upset")
+        put("pareshaan", "worried")
+        put("tension", "stress")
+        put("pyaar", "love")
+        put("mohabbat", "love")
+        put("nafrat", "hate")
+        put("dar", "fear")
+        put("dara", "scared")
+        put("dari", "scared")
+        put("dare", "scared")
+        put("dar lagta", "afraid")
+
+        // ─── State / Health ───
+        put("thak gaya", "tired")
+        put("thak gayi", "tired")
+        put("thak gaye", "tired")
+        put("thak", "tire")
+        put("thakna", "tire")
+        put("thaka", "tired")
+        put("thaki", "tired")
+        put("thake", "tired")
+        put("bimar", "sick")
+        put("bemaar", "sick")
+        put("bimaar", "sick")
+        put("swasth", "healthy")
+        put("tandurust", "healthy")
+        put("thik", "fine")
+        put("theek", "fine")
+        put("achha", "good")
+        put("behtar", "better")
+        put("kharab", "bad")
+        put("buri tarah", "badly")
+        put("aaram", "rest")
+        put("aaram karna", "rest")
+
+        // ─── Perception / Cognition ───
+        put("yaad", "remember")
+        put("yaad hai", "remember")
+        put("yaad aaya", "remembered")
+        put("bhool", "forget")
+        put("bhul", "forget")
+        put("bhool gaya", "forgot")
+        put("bhool gayi", "forgot")
+        put("samajh", "understand")
+        put("samajh aaya", "understood")
+        put("samajh mein aaya", "understood")
+        put("pata", "know")
+        put("pata hai", "know")
+        put("pata nahi", "do not know")
+        put("malum", "known")
+        put("malum hai", "know")
+
+        // ─── Communication ───
+        put("khabar", "news")
+        put("awaaz", "voice")
+        put("awaz", "voice")
+        put("sawaal", "question")
+        put("jawaab", "answer")
+        put("javaab", "answer")
+        put("baat", "talk")
+        put("baatein", "talks")
+        put("baatcheet", "conversation")
+        put("shor", "noise")
+        put("khamoshi", "silence")
+        put("chup", "quiet")
+
+        // ─── Time ───
+        put("shuru", "start")
+        put("suru", "start")
+        put("khatam", "finish")
+        put("khtam", "finish")
+        put("samay", "time")
+        put("waqt", "time")
+        put("vela", "time")
+        put("pala", "moment")
+        put("lamha", "moment")
+        put("waada", "promise")
+        put("vaada", "promise")
+
+        // ─── Quality / Quantity ───
+        put("aasan", "easy")
+        put("mushkil", "difficult")
+        put("kathin", "hard")
+        put("safal", "successful")
+        put("kaamyab", "successful")
+        put("nakam", "failed")
+        put("naakaam", "failed")
+        put("fayda", "benefit")
+        put("fayeda", "benefit")
+        put("nuksan", "loss")
+        put("koshish", "attempt")
+        put("koshish karna", "try")
+        put("himmat", "courage")
+        put("sahas", "bravery")
+        put("shakti", "strength")
+        put("taakat", "power")
+        put("takleef", "trouble")
+        put("mushkil", "difficulty")
+
+        // ─── Nature / Environment ───
+        put("andhera", "darkness")
+        put("ujala", "light")
+        put("ujala", "brightness")
+        put("roshni", "light")
+        put("chand", "moon")
+        put("chandni", "moonlight")
+        put("suraj", "sun")
+        put("taare", "stars")
+        put("aasmaan", "sky")
+        put("zameen", "ground")
+        put("hawaa", "air")
+        put("hawa", "air")
+        put("aag", "fire")
+        put("aankh", "eye")
     }
 
     private val knownVerbs = setOf(
