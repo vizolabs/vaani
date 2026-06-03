@@ -40,6 +40,7 @@ class VaaniKeyboardService : InputMethodService() {
     private val keyboardRows = mutableListOf<View>()
     private val sentenceEndChars = setOf(".", "!", "?")
     private val autoSpaceChars = setOf(".", "!", "?", ",", ";", ":")
+    private val doubleSpaceMs = 500L
 
     private val letterKeyIds = listOf(
         R.id.key_q, R.id.key_w, R.id.key_e, R.id.key_r, R.id.key_t,
@@ -359,7 +360,7 @@ class VaaniKeyboardService : InputMethodService() {
 
     private fun handleSpace() {
         val now = System.currentTimeMillis()
-        if (now - lastSpaceTime < 500) {
+        if (now - lastSpaceTime < doubleSpaceMs) {
             val ic = currentInputConnection ?: return
             ic.deleteSurroundingText(1, 0)
             if (currentInput.isNotEmpty()) currentInput.deleteCharAt(currentInput.length - 1)
