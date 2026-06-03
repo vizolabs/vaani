@@ -80,6 +80,15 @@ object Transliterator {
         }
     }
 
+    private val matraMap = mapOf(
+        "a" to "ा", "aa" to "ा", "A" to "ा",
+        "i" to "ि", "ii" to "ी", "I" to "ी",
+        "u" to "ु", "uu" to "ू", "U" to "ू",
+        "e" to "े", "E" to "े",
+        "o" to "ो", "O" to "ो",
+        "ai" to "ै", "au" to "ौ",
+    )
+
     private fun phoneticFallback(input: String): String {
         val lower = input.lowercase()
         if (lower.length <= 2) return input
@@ -87,34 +96,38 @@ object Transliterator {
         val result = StringBuilder()
         var i = 0
         while (i < lower.length) {
-            // Try longest match first (3 chars, then 2, then 1)
-            when {
-                i + 3 <= lower.length -> {
-                    val triple = lower.substring(i, i + 3)
-                    val mapped = lookup[triple]
-                    if (mapped != null) {
+            val maxLen = minOf(3, lower.length - i)
+            var matched = false
+            for (len in maxLen downTo 1) {
+                val key = lower.substring(i, i + len)
+                val mapped = lookup[key]
+                if (mapped != null) {
+                    if (mapped.endsWith("्") && i + len < lower.length) {
+                        val afterKey = lower.substring(i + len)
+                        val matraMatch = (minOf(2, afterKey.length) downTo 1)
+                            .firstOrNull { mlen ->
+                                val mk = afterKey.substring(0, mlen)
+                                mk in matraMap
+                            }
+                        if (matraMatch != null) {
+                            result.append(mapped.dropLast(1))
+                            result.append(matraMap[afterKey.substring(0, matraMatch)])
+                            i += len + matraMatch
+                            matched = true
+                            break
+                        }
+                    }
+                    if (!matched) {
                         result.append(mapped)
-                        i += 3
-                    } else {
-                        i += 1
-                        result.append(lower[i - 1])
+                        i += len
+                        matched = true
+                        break
                     }
                 }
-                i + 2 <= lower.length -> {
-                    val pair = lower.substring(i, i + 2)
-                    val mapped = lookup[pair]
-                    if (mapped != null) {
-                        result.append(mapped)
-                        i += 2
-                    } else {
-                        i += 1
-                        result.append(lower[i - 1])
-                    }
-                }
-                else -> {
-                    result.append(lower[i])
-                    i += 1
-                }
+            }
+            if (!matched) {
+                result.append(lower[i])
+                i += 1
             }
         }
         return result.toString()
