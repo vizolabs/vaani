@@ -31,6 +31,11 @@
             android:exported="false"
             android:parentActivityName=".ui.SplashActivity" />
 
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.SplashActivity" />
+
         <service
             android:name=".ime.VaaniKeyboardService"
             android:exported="true"
