@@ -18,6 +18,7 @@ class SettingsActivity : BaseActivity() {
         setupLanguageButtons()
         setupKeyboardHeight()
         setupHapticToggle()
+        setupSoundToggle()
     }
 
     private fun setupLanguageButtons() {
@@ -79,6 +80,14 @@ class SettingsActivity : BaseActivity() {
         switch.isChecked = prefs.hapticEnabled
         switch.setOnCheckedChangeListener { _, isChecked ->
             prefs.hapticEnabled = isChecked
+        }
+    }
+
+    private fun setupSoundToggle() {
+        val switch = findViewById<SwitchCompat>(R.id.switch_sound)
+        switch.isChecked = prefs.soundEnabled
+        switch.setOnCheckedChangeListener { _, isChecked ->
+            prefs.soundEnabled = isChecked
         }
     }
 

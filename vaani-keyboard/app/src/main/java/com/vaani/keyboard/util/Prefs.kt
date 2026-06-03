@@ -41,6 +41,10 @@ class Prefs(context: Context) {
         get() = prefs.getBoolean(KEY_HAPTIC, true)
         set(value) = prefs.edit { putBoolean(KEY_HAPTIC, value) }
 
+    var soundEnabled: Boolean
+        get() = prefs.getBoolean(KEY_SOUND, false)
+        set(value) = prefs.edit { putBoolean(KEY_SOUND, value) }
+
     fun clear() {
         prefs.edit { clear() }
     }
@@ -52,5 +56,6 @@ class Prefs(context: Context) {
         private const val KEY_LAST_ACTIVE = "last_active_timestamp"
         private const val KEY_KEYBOARD_HEIGHT = "keyboard_height"
         private const val KEY_HAPTIC = "haptic_feedback"
+        private const val KEY_SOUND = "key_sound"
     }
 }

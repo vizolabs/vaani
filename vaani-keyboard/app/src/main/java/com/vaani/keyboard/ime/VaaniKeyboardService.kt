@@ -1,7 +1,9 @@
 package com.vaani.keyboard.ime
 
 import android.inputmethodservice.InputMethodService
+import android.media.AudioManager
 import android.view.HapticFeedbackConstants
+import android.view.SoundEffectConstants
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -278,6 +280,9 @@ class VaaniKeyboardService : InputMethodService() {
             if (prefs.hapticEnabled) {
                 key.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             }
+            if (prefs.soundEnabled) {
+                (getSystemService(AUDIO_SERVICE) as? AudioManager)?.playSoundEffect(AudioManager.FX_KEY_CLICK)
+            }
             onKeyPressed(value)
         }
         key.setOnLongClickListener {
@@ -338,13 +343,14 @@ class VaaniKeyboardService : InputMethodService() {
         val char = if (isShifted || isCaps) c.uppercase() else c
         commitText(char)
         currentInput.append(char)
+        val sentenceEnd = char in listOf(".", "!", "?")
         val autoSpace = char in listOf(".", "!", "?", ",", ";", ":")
         if (autoSpace) {
             commitText(" ")
             currentInput.append(" ")
         }
         updatePreview()
-        if (isShifted && !isCaps) {
+        if (isShifted && !isCaps && !sentenceEnd) {
             isShifted = false
             updateShiftKeyAppearance()
         }
@@ -359,6 +365,9 @@ class VaaniKeyboardService : InputMethodService() {
             commitText(". ")
             currentInput.append(". ")
             lastSpaceTime = 0L
+            isShifted = true
+            updateShiftKeyAppearance()
+            updateKeyLabels()
         } else {
             commitText(" ")
             currentInput.append(" ")
