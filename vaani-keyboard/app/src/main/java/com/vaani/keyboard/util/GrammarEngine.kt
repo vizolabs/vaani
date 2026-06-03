@@ -111,13 +111,13 @@ object GrammarEngine {
         "acheive" to "achieve", "acheived" to "achieved", "acheiving" to "achieving",
         "beleive" to "believe", "beleived" to "believed", "beleiving" to "believing",
         "calender" to "calendar",
-        "definately" to "definitely", "definately" to "definitely",
+        "definately" to "definitely",
         "dissapoint" to "disappoint", "dissapointed" to "disappointed",
         "embarass" to "embarrass", "embarassed" to "embarrassed",
         "famoust" to "famous",
         "goverment" to "government",
         "grammer" to "grammar",
-        "happenn" to "happen", "happenned" to "happened", "happening" to "happening",
+        "happenn" to "happen", "happenned" to "happened",
         "immediatly" to "immediately",
         "jewellery" to "jewelry",
         "knowlege" to "knowledge",
@@ -180,10 +180,30 @@ object GrammarEngine {
     private fun fixTenseMismatch(text: String): String {
         var result = text
 
-        result = result.replace(Regex("\\bI am having\\b", RegexOption.IGNORE_CASE)) { match ->
-            if (match.value.matches(Regex(".*\\bhaving\\b.*(\\bcar\\b|\\bbike\\b|\\bhouse\\b|\\bphone\\b|\\blaptop\\b|\\bcomputer\\b|\\bTV\\b|\\btv\\b|\\bbook\\b|\\bpen\\b|\\bbag\\b|\\bwatch\\b)")))
-                "I have"
-            else match.value
+        val possessionNouns = setOf(
+            "car", "bike", "house", "phone", "laptop", "computer", "TV", "tv",
+            "book", "pen", "bag", "watch", "bicycle", "vehicle", "motorcycle",
+            "smartphone", "tablet", "ipad", "iphone", "android", "macbook",
+            "wallet", "key", "keys", "purse", "backpack", "suitcase",
+            "apartment", "flat", "room", "property", "land",
+        )
+        val possessionExclusions = setOf(
+            "dinner", "lunch", "breakfast", "brunch", "meal", "food",
+            "fun", "time", "party", "meeting", "conversation", "chat",
+            "bath", "shower", "swim", "walk", "drive", "ride",
+            "class", "lesson", "course", "training", "session",
+            "problem", "issue", "difficulty", "trouble",
+            "baby", "child", "children",
+        )
+
+        result = result.replace(Regex("\\bI am having\\b", RegexOption.IGNORE_CASE)) {
+            val hasPossession = possessionNouns.any { noun ->
+                Regex("\\b$noun\\b", RegexOption.IGNORE_CASE).containsMatchIn(result.substringAfter("having"))
+            }
+            val hasExclusion = possessionExclusions.any { exc ->
+                Regex("\\b$exc\\b", RegexOption.IGNORE_CASE).containsMatchIn(result.substringAfter("having"))
+            }
+            if (hasPossession && !hasExclusion) "I have" else it.value
         }
 
         result = result.replace(Regex("\\bhave you ate\\b", RegexOption.IGNORE_CASE)) { "have you eaten" }
