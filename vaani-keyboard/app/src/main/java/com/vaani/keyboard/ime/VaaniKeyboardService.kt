@@ -325,7 +325,7 @@ class VaaniKeyboardService : InputMethodService() {
         when (value) {
             "shift" -> handleCapsLock()
             "backspace" -> { clearAll(); updatePreview() }
-            "." -> commitText("...")
+            "." -> commitInput("...")
             "mic" -> {
                 if (!PermissionHelper.hasRecordAudio(this)) {
                     PermissionHelper.openAppSettings(this)
