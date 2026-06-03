@@ -12,7 +12,6 @@ class SpeechRecognizerHelper(
     private val context: Context,
     private val onResult: (String) -> Unit,
     private val onError: (String) -> Unit,
-    private val onListening: () -> Unit = {}
 ) {
 
     private var recognizer: SpeechRecognizer? = null
@@ -21,7 +20,6 @@ class SpeechRecognizerHelper(
     private val listener = object : RecognitionListener {
         override fun onReadyForSpeech(params: Bundle?) {
             isListening = true
-            onListening()
         }
 
         override fun onBeginningOfSpeech() {}
