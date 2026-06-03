@@ -38,6 +38,8 @@ class VaaniKeyboardService : InputMethodService() {
     private lateinit var symbolsView: View
     private var speechHelper: SpeechRecognizerHelper? = null
     private val keyboardRows = mutableListOf<View>()
+    private val sentenceEndChars = setOf(".", "!", "?")
+    private val autoSpaceChars = setOf(".", "!", "?", ",", ";", ":")
 
     private val letterKeyIds = listOf(
         R.id.key_q, R.id.key_w, R.id.key_e, R.id.key_r, R.id.key_t,
@@ -342,8 +344,8 @@ class VaaniKeyboardService : InputMethodService() {
         val char = if (isShifted || isCaps) c.uppercase() else c
         commitText(char)
         currentInput.append(char)
-        val sentenceEnd = char in listOf(".", "!", "?")
-        val autoSpace = char in listOf(".", "!", "?", ",", ";", ":")
+        val sentenceEnd = char in sentenceEndChars
+        val autoSpace = char in autoSpaceChars
         if (autoSpace) {
             commitText(" ")
             currentInput.append(" ")
