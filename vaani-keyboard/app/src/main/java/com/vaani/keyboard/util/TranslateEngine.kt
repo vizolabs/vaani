@@ -1361,10 +1361,9 @@ object TranslateEngine {
         put("aapko", "you")
         put("aapse", "from you")
 
-        put("woh", "that")
+        put("woh", "that, they")
         put("wo", "that")
         put("voh", "that")
-        put("woh", "they")
         put("unka", "their")
         put("unki", "their")
         put("unke", "their")
