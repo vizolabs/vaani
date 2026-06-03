@@ -334,8 +334,7 @@ class VaaniKeyboardService : InputMethodService() {
             else -> {
                 val alt = altChars[value]
                 if (alt != null && alt.isNotEmpty()) {
-                    commitText(alt.first().toString())
-                    currentInput.append(alt.first())
+                    commitInput(alt.first().toString())
                     updatePreview()
                 }
             }
@@ -357,13 +356,11 @@ class VaaniKeyboardService : InputMethodService() {
 
     private fun handleChar(c: String) {
         val char = if (isShifted || isCaps) c.uppercase() else c
-        commitText(char)
-        currentInput.append(char)
+        commitInput(char)
         val sentenceEnd = char in sentenceEndChars
         val autoSpace = char in autoSpaceChars
         if (autoSpace) {
-            commitText(" ")
-            currentInput.append(" ")
+            commitInput(" ")
         }
         updatePreview()
         if (isShifted && !isCaps && !sentenceEnd) {
@@ -378,15 +375,13 @@ class VaaniKeyboardService : InputMethodService() {
             val ic = currentInputConnection ?: return
             ic.deleteSurroundingText(1, 0)
             if (currentInput.isNotEmpty()) currentInput.deleteCharAt(currentInput.length - 1)
-            commitText(". ")
-            currentInput.append(". ")
+            commitInput(". ")
             lastSpaceTime = 0L
             isShifted = true
             updateShiftKeyAppearance()
             updateKeyLabels()
         } else {
-            commitText(" ")
-            currentInput.append(" ")
+            commitInput(" ")
         }
         lastSpaceTime = now
         updatePreview()
@@ -457,8 +452,7 @@ class VaaniKeyboardService : InputMethodService() {
         speechHelper = SpeechRecognizerHelper(
             context = this,
             onResult = { text ->
-                commitText("$text ")
-                currentInput.append("$text ")
+                commitInput("$text ")
                 updatePreview()
             },
             onError = { error ->
@@ -486,6 +480,11 @@ class VaaniKeyboardService : InputMethodService() {
 
     private fun commitText(text: String) {
         currentInputConnection?.commitText(text, 1)
+    }
+
+    private fun commitInput(text: String) {
+        commitText(text)
+        currentInput.append(text)
     }
 
     private fun clearAll() {
