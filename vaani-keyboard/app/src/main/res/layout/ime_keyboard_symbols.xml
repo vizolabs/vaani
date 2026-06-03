@@ -7,6 +7,43 @@
     android:paddingHorizontal="@dimen/kb_padding_horizontal"
     android:paddingBottom="@dimen/kb_padding_bottom">
 
+    <!-- Preview Bar -->
+    <LinearLayout
+        android:id="@+id/preview_bar_sym"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/kb_preview_height"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:background="@drawable/preview_bar_bg"
+        android:layout_marginBottom="4dp"
+        android:paddingHorizontal="12dp">
+
+        <TextView
+            android:id="@+id/tv_preview_hindi_sym"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:textColor="@color/kb_preview_text"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif"
+            android:ellipsize="end"
+            android:maxLines="1" />
+
+        <TextView
+            android:id="@+id/tv_preview_english_sym"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:textColor="@color/kb_preview_english"
+            android:textSize="14sp"
+            android:fontFamily="sans-serif-medium"
+            android:ellipsize="end"
+            android:maxLines="1" />
+
+    </LinearLayout>
+
     <!-- Suggestion Bar -->
     <LinearLayout
         android:id="@+id/suggestion_bar_sym"
@@ -110,7 +147,7 @@
 
     </LinearLayout>
 
-    <!-- Row 4: ABC mic space . send -->
+    <!-- Row 4: ABC lang mic space . send -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/kb_key_height"
@@ -125,6 +162,14 @@
             android:text="@string/kb_abc_toggle" />
 
         <Button
+            android:id="@+id/key_lang_sym"
+            style="@style/Widget.Vaani.Key"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="HI"
+            android:fontFamily="sans-serif-medium" />
+
+        <Button
             android:id="@+id/key_mic_sym"
             style="@style/Widget.Vaani.Key"
             android:layout_width="0dp"
@@ -137,7 +182,7 @@
             android:id="@+id/key_space_sym"
             style="@style/Widget.Vaani.Key"
             android:layout_width="0dp"
-            android:layout_weight="5"
+            android:layout_weight="4"
             android:text="" />
 
         <Button
