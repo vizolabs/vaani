@@ -189,32 +189,34 @@ object GrammarEngine {
         return result
     }
 
+    private val possessionNouns = setOf(
+        "car", "bike", "house", "phone", "laptop", "computer", "TV", "tv",
+        "book", "pen", "bag", "watch", "bicycle", "vehicle", "motorcycle",
+        "smartphone", "tablet", "ipad", "iphone", "android", "macbook",
+        "wallet", "key", "keys", "purse", "backpack", "suitcase",
+        "apartment", "flat", "room", "property", "land",
+    )
+    private val possessionExclusions = setOf(
+        "dinner", "lunch", "breakfast", "brunch", "meal", "food",
+        "fun", "time", "party", "meeting", "conversation", "chat",
+        "bath", "shower", "swim", "walk", "drive", "ride",
+        "class", "lesson", "course", "training", "session",
+        "problem", "issue", "difficulty", "trouble",
+        "baby", "child", "children",
+    )
+    private val possessionNounPattern = Regex(
+        "\\b(${possessionNouns.joinToString("|")})\\b", RegexOption.IGNORE_CASE
+    )
+    private val possessionExclusionPattern = Regex(
+        "\\b(${possessionExclusions.joinToString("|")})\\b", RegexOption.IGNORE_CASE
+    )
+
     private fun fixTenseMismatch(text: String): String {
         var result = text
 
-        val possessionNouns = setOf(
-            "car", "bike", "house", "phone", "laptop", "computer", "TV", "tv",
-            "book", "pen", "bag", "watch", "bicycle", "vehicle", "motorcycle",
-            "smartphone", "tablet", "ipad", "iphone", "android", "macbook",
-            "wallet", "key", "keys", "purse", "backpack", "suitcase",
-            "apartment", "flat", "room", "property", "land",
-        )
-        val possessionExclusions = setOf(
-            "dinner", "lunch", "breakfast", "brunch", "meal", "food",
-            "fun", "time", "party", "meeting", "conversation", "chat",
-            "bath", "shower", "swim", "walk", "drive", "ride",
-            "class", "lesson", "course", "training", "session",
-            "problem", "issue", "difficulty", "trouble",
-            "baby", "child", "children",
-        )
-
         result = result.replace(Regex("\\bI am having\\b", RegexOption.IGNORE_CASE)) {
-            val hasPossession = possessionNouns.any { noun ->
-                Regex("\\b$noun\\b", RegexOption.IGNORE_CASE).containsMatchIn(result.substringAfter("having"))
-            }
-            val hasExclusion = possessionExclusions.any { exc ->
-                Regex("\\b$exc\\b", RegexOption.IGNORE_CASE).containsMatchIn(result.substringAfter("having"))
-            }
+            val hasPossession = possessionNounPattern.containsMatchIn(result.substringAfter("having"))
+            val hasExclusion = possessionExclusionPattern.containsMatchIn(result.substringAfter("having"))
             if (hasPossession && !hasExclusion) "I have" else it.value
         }
 
