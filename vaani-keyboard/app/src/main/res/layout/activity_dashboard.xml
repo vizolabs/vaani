@@ -55,4 +55,43 @@
         android:focusable="true"
         android:background="@drawable/chip_bg" />
 
+    <!-- AI Model Section -->
+    <TextView
+        android:id="@+id/tv_model_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:text="@string/model_section_label"
+        android:textColor="@color/vaani_text"
+        android:textSize="15sp"
+        android:fontFamily="sans-serif-medium" />
+
+    <TextView
+        android:id="@+id/tv_model_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/vaani_text_muted"
+        android:textSize="14sp" />
+
+    <ProgressBar
+        android:id="@+id/progress_model"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_marginTop="12dp"
+        android:progressTint="@color/vaani_accent"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/btn_model_action"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
+        android:text="@string/model_download_button"
+        android:textColor="@color/vaani_text"
+        android:backgroundTint="@color/vaani_surface_card"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
 </LinearLayout>

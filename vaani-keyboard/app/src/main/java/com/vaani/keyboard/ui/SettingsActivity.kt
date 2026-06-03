@@ -2,14 +2,25 @@ package com.vaani.keyboard.ui
 
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
 import com.vaani.keyboard.R
+import com.vaani.keyboard.util.ModelManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import java.io.File
 
 class SettingsActivity : BaseActivity() {
+
+    private val uiScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private var modelManager: ModelManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,6 +30,7 @@ class SettingsActivity : BaseActivity() {
         setupKeyboardHeight()
         setupHapticToggle()
         setupSoundToggle()
+        setupModelSection()
     }
 
     private fun setupLanguageButtons() {
@@ -89,6 +101,139 @@ class SettingsActivity : BaseActivity() {
         switch.setOnCheckedChangeListener { _, isChecked ->
             prefs.soundEnabled = isChecked
         }
+    }
+
+    private fun setupModelSection() {
+        val statusText = findViewById<TextView>(R.id.tv_settings_model_status)
+        val progressBar = findViewById<ProgressBar>(R.id.progress_settings_model)
+        val actionBtn = findViewById<Button>(R.id.btn_settings_model_action)
+
+        updateModelUi(statusText, progressBar, actionBtn)
+
+        actionBtn.setOnClickListener {
+            if (prefs.modelDownloaded) {
+                confirmDeleteModel(statusText, progressBar, actionBtn)
+            } else {
+                startDownload(statusText, progressBar, actionBtn)
+            }
+        }
+    }
+
+    private fun updateModelUi(
+        statusText: TextView,
+        progressBar: ProgressBar,
+        actionBtn: Button
+    ) {
+        if (prefs.modelDownloaded) {
+            val modelDir = File(filesDir, "models")
+            if (ModelManager.verifyModels(modelDir)) {
+                statusText.text = getString(R.string.model_status_ready)
+                statusText.setTextColor(getColorAccent())
+                actionBtn.text = getString(R.string.model_delete_button)
+                progressBar.visibility = android.view.View.GONE
+            } else {
+                prefs.modelDownloaded = false
+                prefs.modelDownloadProgress = 0
+                statusText.text = getString(R.string.model_status_not_downloaded)
+                statusText.setTextColor(getColorMuted())
+                actionBtn.text = getString(R.string.model_download_button)
+                progressBar.visibility = android.view.View.GONE
+            }
+        } else {
+            val progress = prefs.modelDownloadProgress
+            if (progress > 0 && progress < 100) {
+                statusText.text = getString(R.string.model_status_downloading, progress)
+                statusText.setTextColor(getColorMuted())
+                actionBtn.text = getString(R.string.model_download_button)
+                progressBar.visibility = android.view.View.VISIBLE
+                progressBar.progress = progress
+            } else {
+                statusText.text = getString(R.string.model_status_not_downloaded)
+                statusText.setTextColor(getColorMuted())
+                actionBtn.text = getString(R.string.model_download_button)
+                progressBar.visibility = android.view.View.GONE
+            }
+        }
+    }
+
+    private fun startDownload(
+        statusText: TextView,
+        progressBar: ProgressBar,
+        actionBtn: Button
+    ) {
+        actionBtn.isEnabled = false
+        progressBar.visibility = android.view.View.VISIBLE
+        progressBar.progress = 0
+        statusText.text = getString(R.string.model_status_downloading, 0)
+
+        val modelDir = File(filesDir, "models")
+        modelManager = ModelManager(object : ModelManager.Callback {
+            override fun onProgress(percent: Int) {
+                uiScope.launch {
+                    progressBar.progress = percent
+                    statusText.text = getString(R.string.model_status_downloading, percent)
+                    prefs.modelDownloadProgress = percent
+                }
+            }
+
+            override fun onComplete(success: Boolean, message: String) {
+                uiScope.launch {
+                    actionBtn.isEnabled = true
+                    if (success) {
+                        prefs.modelDownloaded = true
+                        prefs.modelDownloadProgress = 100
+                        statusText.text = getString(R.string.model_status_ready)
+                        statusText.setTextColor(getColorAccent())
+                        actionBtn.text = getString(R.string.model_delete_button)
+                        progressBar.visibility = android.view.View.GONE
+                    } else {
+                        prefs.modelDownloadProgress = 0
+                        statusText.text = getString(R.string.model_download_failed, message)
+                        statusText.setTextColor(getColorMuted())
+                        actionBtn.text = getString(R.string.model_download_button)
+                        progressBar.visibility = android.view.View.GONE
+                    }
+                }
+            }
+        })
+        uiScope.launch(Dispatchers.IO) {
+            modelManager!!.downloadAll(modelDir)
+        }
+    }
+
+    private fun confirmDeleteModel(
+        statusText: TextView,
+        progressBar: ProgressBar,
+        actionBtn: Button
+    ) {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.model_delete_confirm_title)
+            .setMessage(R.string.model_delete_confirm_message)
+            .setPositiveButton(R.string.model_delete_confirm_yes) { _, _ ->
+                val modelDir = File(filesDir, "models")
+                modelManager?.deleteModels(modelDir)
+                prefs.modelDownloaded = false
+                prefs.modelDownloadProgress = 0
+                statusText.text = getString(R.string.model_status_not_downloaded)
+                statusText.setTextColor(getColorMuted())
+                actionBtn.text = getString(R.string.model_download_button)
+                progressBar.visibility = android.view.View.GONE
+            }
+            .setNegativeButton(R.string.model_delete_confirm_no, null)
+            .show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        modelManager?.cancel()
+    }
+
+    private fun getColorAccent(): Int {
+        return ContextCompat.getColor(this, R.color.vaani_accent)
+    }
+
+    private fun getColorMuted(): Int {
+        return ContextCompat.getColor(this, R.color.vaani_text_muted)
     }
 
     private fun showSaved() {
