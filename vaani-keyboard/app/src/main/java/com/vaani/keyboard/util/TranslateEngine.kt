@@ -1396,7 +1396,7 @@ object TranslateEngine {
         put("kisi ki", "someone's")
         put("kisi ke", "someone's")
 
-        put("aur", "and")
+        put("aur", "and, more")
         put("lekin", "but")
         put("magar", "but")
         put("parantu", "however")
@@ -1409,7 +1409,6 @@ object TranslateEngine {
         put("to", "then")
         put("bhi", "also")
         put("hi", "only")
-        put("bhi", "also")
 
         put("achha", "good")
         put("achhi", "good")
@@ -1431,7 +1430,6 @@ object TranslateEngine {
         put("puri", "complete")
         put("sabse", "most")
         put("kam", "less")
-        put("aur", "more")
         put("kum", "less")
 
         put("jaana", "go")
