@@ -468,6 +468,16 @@ class VaaniKeyboardService : InputMethodService() {
         if (rawText.isEmpty()) return
         val ic = currentInputConnection ?: return
 
+        val beforeCursor = ic.getTextBeforeCursor(currentInput.length, 0)?.toString() ?: ""
+        if (beforeCursor.lowercase() != rawText.lowercase()) {
+            ic.commitText(rawText, 1)
+            currentInput.clear()
+            prefs.incrementTranslationCount()
+            prefs.markActive()
+            updatePreview()
+            return
+        }
+
         val english = TranslateEngine.translate(rawText)
 
         ic.deleteSurroundingText(currentInput.length, 0)
