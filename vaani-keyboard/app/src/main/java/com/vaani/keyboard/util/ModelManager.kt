@@ -1,35 +1,58 @@
 package com.vaani.keyboard.util
 
-import android.os.Environment
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.security.MessageDigest
 
 class ModelManager(private val callback: Callback) {
 
     interface Callback {
         fun onProgress(percent: Int)
+        fun onVerify()
         fun onComplete(success: Boolean, message: String)
     }
 
     companion object {
         private const val TAG = "ModelManager"
         private const val BUFFER_SIZE = 8192
+        private const val HASH_ALGORITHM = "SHA-256"
 
         private val BASE = "https://huggingface.co/Xenova/nllb-200-distilled-600M/resolve/main/onnx"
         private val SPM_BASE = "https://huggingface.co/facebook/nllb-200-distilled-600M/resolve/main"
 
         val FILES = listOf(
-            ModelFile("encoder_model_quantized.onnx", "$BASE/encoder_model_quantized.onnx", 419_000_000),
-            ModelFile("decoder_with_past_model_quantized.onnx", "$BASE/decoder_with_past_model_quantized.onnx", 445_000_000),
-            ModelFile("sentencepiece.bpe.model", "$SPM_BASE/sentencepiece.bpe.model", 4_000_000)
+            ModelFile(
+                "encoder_model_quantized.onnx",
+                "$BASE/encoder_model_quantized.onnx",
+                419_000_000,
+                ""
+            ),
+            ModelFile(
+                "decoder_with_past_model_quantized.onnx",
+                "$BASE/decoder_with_past_model_quantized.onnx",
+                445_000_000,
+                ""
+            ),
+            ModelFile(
+                "sentencepiece.bpe.model",
+                "$SPM_BASE/sentencepiece.bpe.model",
+                4_000_000,
+                ""
+            )
         )
 
-        data class ModelFile(val name: String, val url: String, val sizeEstimate: Int)
+        data class ModelFile(
+            val name: String,
+            val url: String,
+            val sizeEstimate: Int,
+            val expectedSha256: String
+        )
     }
 
     private var cancelled = false
@@ -52,14 +75,24 @@ class ModelManager(private val callback: Callback) {
             }
             val target = File(modelDir, file.name)
             if (target.exists() && target.length() > 0) {
-                completedFiles++
-                updateProgress(completedFiles, totalFiles)
-                continue
+                if (verifyFileHash(target, file.expectedSha256)) {
+                    completedFiles++
+                    updateProgress(completedFiles, totalFiles)
+                    continue
+                }
+                target.delete()
             }
             try {
                 downloadFile(file, target) { percent ->
                     val overall = ((completedFiles.toFloat() + percent.toFloat() / 100f) / totalFiles.toFloat() * 100).toInt()
                     callback.onProgress(overall)
+                }
+                callback.onVerify()
+                if (!verifyFileHash(target, file.expectedSha256)) {
+                    target.delete()
+                    Log.e(TAG, "SHA256 mismatch for ${file.name}")
+                    callback.onComplete(false, "Integrity check failed for ${file.name}")
+                    return@withContext
                 }
                 completedFiles++
                 updateProgress(completedFiles, totalFiles)
@@ -135,7 +168,31 @@ class ModelManager(private val callback: Callback) {
         for (file in FILES) {
             val f = File(modelDir, file.name)
             if (!f.exists() || f.length() == 0L) return false
+            if (!verifyFileHash(f, file.expectedSha256)) return false
         }
         return true
+    }
+
+    private fun verifyFileHash(file: File, expectedHash: String): Boolean {
+        if (expectedHash.isBlank()) return true
+        return try {
+            val actual = sha256(file)
+            actual.equals(expectedHash, ignoreCase = true)
+        } catch (e: Exception) {
+            Log.w(TAG, "Hash check failed: ${e.message}")
+            false
+        }
+    }
+
+    private fun sha256(file: File): String {
+        val digest = MessageDigest.getInstance(HASH_ALGORITHM)
+        FileInputStream(file).use { fis ->
+            val buffer = ByteArray(BUFFER_SIZE)
+            var bytesRead: Int
+            while (fis.read(buffer).also { bytesRead = it } != -1) {
+                digest.update(buffer, 0, bytesRead)
+            }
+        }
+        return digest.digest().joinToString("") { "%02x".format(it) }
     }
 }
