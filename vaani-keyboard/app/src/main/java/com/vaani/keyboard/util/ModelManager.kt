@@ -2,6 +2,7 @@ package com.vaani.keyboard.util
 
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
@@ -13,8 +14,9 @@ import java.security.MessageDigest
 class ModelManager(private val callback: Callback) {
 
     interface Callback {
-        fun onProgress(percent: Int)
-        fun onVerify()
+        fun onFileProgress(fileName: String, bytesDownloaded: Long, totalBytes: Long, speedKBps: Long)
+        fun onOverallProgress(percent: Int)
+        fun onVerify(fileName: String)
         fun onComplete(success: Boolean, message: String)
     }
 
@@ -22,6 +24,8 @@ class ModelManager(private val callback: Callback) {
         private const val TAG = "ModelManager"
         private const val BUFFER_SIZE = 8192
         private const val HASH_ALGORITHM = "SHA-256"
+        private const val MAX_RETRIES = 3
+        private const val BASE_BACKOFF_MS = 2000L
 
         private val BASE = "https://huggingface.co/Xenova/nllb-200-distilled-600M/resolve/main/onnx"
         private val SPM_BASE = "https://huggingface.co/facebook/nllb-200-distilled-600M/resolve/main"
@@ -67,6 +71,7 @@ class ModelManager(private val callback: Callback) {
 
         val totalFiles = FILES.size
         var completedFiles = 0
+        val failedFiles = mutableListOf<ModelFile>()
 
         for (file in FILES) {
             if (cancelled) {
@@ -75,46 +80,70 @@ class ModelManager(private val callback: Callback) {
             }
             val target = File(modelDir, file.name)
             if (target.exists() && target.length() > 0) {
+                callback.onVerify(file.name)
                 if (verifyFileHash(target, file.expectedSha256)) {
                     completedFiles++
-                    updateProgress(completedFiles, totalFiles)
+                    updateOverall(completedFiles, totalFiles)
                     continue
                 }
                 target.delete()
             }
-            try {
-                downloadFile(file, target) { percent ->
-                    val overall = ((completedFiles.toFloat() + percent.toFloat() / 100f) / totalFiles.toFloat() * 100).toInt()
-                    callback.onProgress(overall)
-                }
-                callback.onVerify()
-                if (!verifyFileHash(target, file.expectedSha256)) {
-                    target.delete()
-                    Log.e(TAG, "SHA256 mismatch for ${file.name}")
-                    callback.onComplete(false, "Integrity check failed for ${file.name}")
-                    return@withContext
-                }
+            val success = downloadWithRetry(file, target, completedFiles, totalFiles)
+            if (success) {
                 completedFiles++
-                updateProgress(completedFiles, totalFiles)
-            } catch (e: Exception) {
-                Log.e(TAG, "Failed to download ${file.name}: ${e.message}")
-                callback.onComplete(false, "Failed to download ${file.name}: ${e.message}")
-                return@withContext
+                updateOverall(completedFiles, totalFiles)
+            } else {
+                failedFiles.add(file)
             }
         }
 
-        callback.onComplete(true, "All model files downloaded successfully")
+        if (failedFiles.isEmpty()) {
+            callback.onComplete(true, "All model files downloaded successfully")
+        } else {
+            val names = failedFiles.joinToString(", ") { it.name }
+            callback.onComplete(false, "Failed: $names")
+        }
     }
 
-    private fun updateProgress(completed: Int, total: Int) {
-        val percent = (completed.toFloat() / total.toFloat() * 100).toInt()
-        callback.onProgress(percent)
+    private suspend fun downloadWithRetry(
+        file: ModelFile,
+        target: File,
+        completedFiles: Int,
+        totalFiles: Int
+    ): Boolean {
+        var lastError: String? = null
+        for (attempt in 1..MAX_RETRIES) {
+            if (cancelled) return false
+            if (attempt > 1) {
+                val backoff = BASE_BACKOFF_MS * (1 shl (attempt - 2))
+                Log.d(TAG, "Retrying ${file.name} in ${backoff}ms (attempt $attempt/$MAX_RETRIES)")
+                delay(backoff)
+            }
+            try {
+                downloadFile(file, target, completedFiles, totalFiles)
+                callback.onVerify(file.name)
+                if (!verifyFileHash(target, file.expectedSha256)) {
+                    target.delete()
+                    lastError = "SHA256 mismatch"
+                    Log.w(TAG, "$lastError for ${file.name}")
+                    continue
+                }
+                return true
+            } catch (e: Exception) {
+                lastError = e.message ?: "Unknown error"
+                Log.e(TAG, "Attempt $attempt/$MAX_RETRIES failed for ${file.name}: $lastError")
+                target.delete()
+            }
+        }
+        Log.e(TAG, "All $MAX_RETRIES attempts failed for ${file.name}: $lastError")
+        return false
     }
 
     private fun downloadFile(
         file: ModelFile,
         target: File,
-        onProgress: (percent: Int) -> Unit
+        completedFiles: Int,
+        totalFiles: Int
     ) {
         val url = URL(file.url)
         val conn = url.openConnection() as HttpURLConnection
@@ -131,6 +160,7 @@ class ModelManager(private val callback: Callback) {
                 val buffer = ByteArray(BUFFER_SIZE)
                 var bytesRead: Int
                 var totalBytes = 0L
+                val startTime = System.nanoTime()
 
                 while (input.read(buffer).also { bytesRead = it } != -1) {
                     if (cancelled) {
@@ -139,15 +169,30 @@ class ModelManager(private val callback: Callback) {
                     }
                     fos.write(buffer, 0, bytesRead)
                     totalBytes += bytesRead
+
+                    val elapsed = (System.nanoTime() - startTime) / 1_000_000
+                    val speedKBps = if (elapsed > 0) (totalBytes / elapsed) else 0L
+
                     if (contentLength > 0) {
-                        val percent = ((totalBytes.toFloat() / contentLength.toFloat()) * 100).toInt()
-                        onProgress(percent.coerceIn(0, 100))
+                        val filePercent = ((totalBytes.toFloat() / contentLength.toFloat()) * 100).toInt()
+                        val overall = computeOverall(completedFiles, totalFiles, filePercent)
+                        callback.onOverallProgress(overall)
                     }
+
+                    callback.onFileProgress(file.name, totalBytes, contentLength.toLong(), speedKBps)
                 }
             }
         } finally {
             conn.disconnect()
         }
+    }
+
+    private fun computeOverall(completedFiles: Int, totalFiles: Int, currentFilePercent: Int): Int {
+        return ((completedFiles.toFloat() + currentFilePercent.toFloat() / 100f) / totalFiles.toFloat() * 100).toInt()
+    }
+
+    private fun updateOverall(completed: Int, total: Int) {
+        callback.onOverallProgress((completed.toFloat() / total.toFloat() * 100).toInt())
     }
 
     fun deleteModels(modelDir: File): Boolean {
@@ -174,7 +219,7 @@ class ModelManager(private val callback: Callback) {
     }
 
     private fun verifyFileHash(file: File, expectedHash: String): Boolean {
-        if (expectedHash.isBlank()) return true
+        if (expectedHash.isBlank()) return file.exists() && file.length() > 0
         return try {
             val actual = sha256(file)
             actual.equals(expectedHash, ignoreCase = true)

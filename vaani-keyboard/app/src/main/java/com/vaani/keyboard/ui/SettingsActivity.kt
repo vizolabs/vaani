@@ -168,15 +168,22 @@ class SettingsActivity : BaseActivity() {
 
         val modelDir = File(filesDir, "models")
         modelManager = ModelManager(object : ModelManager.Callback {
-            override fun onProgress(percent: Int) {
+            override fun onFileProgress(fileName: String, bytesDownloaded: Long, totalBytes: Long, speedKBps: Long) {
+                uiScope.launch {
+                    val speed = if (speedKBps > 1024) "${speedKBps / 1024} MB/s" else "${speedKBps} KB/s"
+                    val progress = if (totalBytes > 0) (bytesDownloaded * 100 / totalBytes).toInt() else 0
+                    statusText.text = "${fileName}: $progress% at $speed"
+                }
+            }
+
+            override fun onOverallProgress(percent: Int) {
                 uiScope.launch {
                     progressBar.progress = percent
-                    statusText.text = getString(R.string.model_status_downloading, percent)
                     prefs.modelDownloadProgress = percent
                 }
             }
 
-            override fun onVerify() {
+            override fun onVerify(fileName: String) {
                 uiScope.launch {
                     statusText.text = getString(R.string.model_status_verifying)
                 }
