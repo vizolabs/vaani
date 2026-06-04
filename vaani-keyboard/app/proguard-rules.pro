@@ -13,7 +13,3 @@
 # Kotlin Coroutines
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
 -keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
-
-# Keep Vaani model and translate classes
--keep class com.vaani.keyboard.util.ModelLoader { *; }
--keep class com.vaani.keyboard.translate.TranslationPipeline { *; }
