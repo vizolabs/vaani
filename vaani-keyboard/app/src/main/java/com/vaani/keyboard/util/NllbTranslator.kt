@@ -1,6 +1,7 @@
 package com.vaani.keyboard.util
 
 import ai.onnxruntime.OnnxTensor
+import ai.onnxruntime.OnnxValue
 import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OrtSession
 import android.util.Log
@@ -17,10 +18,16 @@ class NllbTranslator(
     private var encoderSession: OrtSession? = null
     private var decoderSession: OrtSession? = null
 
+    private var encoderInputNames: List<String> = emptyList()
+    private var encoderOutputNames: List<String> = emptyList()
+    private var decoderInputNames: List<String> = emptyList()
+    private var decoderOutputNames: List<String> = emptyList()
+
+    private var kvOutputToInput: Map<String, String> = emptyMap()
+
     companion object {
         private const val TAG = "NllbTranslator"
         private const val MAX_DECODE_STEPS = 64
-        private const val BEAM_SIZE = 1
     }
 
     suspend fun load(): Boolean = withContext(Dispatchers.IO) {
@@ -35,11 +42,40 @@ class NllbTranslator(
             val ortOpts = OrtSession.SessionOptions()
             encoderSession = ortEnv!!.createSession(encoderPath, ortOpts)
             decoderSession = ortEnv!!.createSession(decoderPath, ortOpts)
-            Log.d(TAG, "Models loaded successfully")
+
+            detectTensorNames()
+            Log.d(TAG, "Loaded. Encoder ins=$encoderInputNames outs=$encoderOutputNames " +
+                    "Decoder ins=$decoderInputNames outs=$decoderOutputNames " +
+                    "KV map=$kvOutputToInput")
             true
         } catch (e: Exception) {
             Log.e(TAG, "Failed to load models: ${e.message}")
             false
+        }
+    }
+
+    private fun detectTensorNames() {
+        encoderInputNames = (0 until encoderSession!!.getNumInputs())
+            .map { encoderSession!!.getInputName(it) }
+        encoderOutputNames = (0 until encoderSession!!.getNumOutputs())
+            .map { encoderSession!!.getOutputName(it) }
+        decoderInputNames = (0 until decoderSession!!.getNumInputs())
+            .map { decoderSession!!.getInputName(it) }
+        decoderOutputNames = (0 until decoderSession!!.getNumOutputs())
+            .map { decoderSession!!.getOutputName(it) }
+
+        kvOutputToInput = buildMap {
+            for (outName in decoderOutputNames) {
+                if (!outName.startsWith("present.")) continue
+                val suffix = outName.removePrefix("present.")
+                val expectedInput = "past_key_values.$suffix"
+                if (expectedInput in decoderInputNames) {
+                    put(outName, expectedInput)
+                } else {
+                    val match = decoderInputNames.firstOrNull { it.endsWith(suffix) }
+                    if (match != null) put(outName, match)
+                }
+            }
         }
     }
 
@@ -51,46 +87,44 @@ class NllbTranslator(
 
         return withContext(Dispatchers.IO) {
             try {
-                val inputIds = tokenizer.encode(input) ?: return@withContext TranslationResult.Error("Tokenization failed")
+                val inputIds = tokenizer.encode(input)
+                    ?: return@withContext TranslationResult.Error("Tokenization failed")
 
-                val encoderInput = OnnxTensor.createTensor(ortEnv!!, inputIds)
-                val encoderResult = encoderSession!!.run(
-                    mapOf("input_ids" to encoderInput, "attention_mask" to createAttentionMask(inputIds))
-                )
-                encoderInput.close()
+                val encInputs = mutableMapOf<String, OnnxTensor>()
+                encInputs[mapName(encoderInputNames, "input_ids")] =
+                    OnnxTensor.createTensor(ortEnv!!, inputIds)
+                encInputs[mapName(encoderInputNames, "attention_mask")] =
+                    createAttentionMask(inputIds)
 
-                val encoderOutput = encoderResult.get("last_hidden_state") as OnnxTensor
+                val encoderResult = encoderSession!!.run(encInputs)
+                encInputs.values.forEach { it.close() }
+
+                val encoderHiddenName = mapName(encoderOutputNames, "last_hidden_state")
+                val encoderOutput = encoderResult.get(encoderHiddenName) as OnnxTensor
                 var outputIds = intArrayOf(NllbTokenizer.ENGLISH_LANG, NllbTokenizer.BOS)
 
                 val pastKeyValues = mutableMapOf<String, OnnxValue>()
 
                 for (step in 0 until MAX_DECODE_STEPS) {
                     val decoderInput = OnnxTensor.createTensor(ortEnv!!, outputIds.last())
-
-                    val decoderInputs = mutableMapOf(
-                        "input_ids" to decoderInput,
-                        "encoder_hidden_states" to encoderOutput,
-                        "encoder_attention_mask" to createAttentionMask(inputIds)
-                    )
-                    pastKeyValues.forEach { (k, v) -> decoderInputs["past_key_values.${k}"] = v }
-
-                    val decoderResult = decoderSession!!.run(decoderInputs)
+                    val decInputs = buildDecInputs(decoderInput, encoderOutput, inputIds, pastKeyValues)
+                    val decoderResult = decoderSession!!.run(decInputs)
                     decoderInput.close()
 
-                    val logits = decoderResult.get("logits") as OnnxTensor
+                    val logitsName = mapName(decoderOutputNames, "logits")
+                    val logits = decoderResult.get(logitsName) as OnnxTensor
                     val nextId = argMax(logits)
                     logits.close()
 
                     pastKeyValues.clear()
-                    for ((key, value) in decoderResult) {
-                        if (key.startsWith("present.")) {
-                            val pkvKey = key.removePrefix("present.")
-                            pastKeyValues[pkvKey] = value
+                    for ((name, value) in decoderResult) {
+                        val inputName = kvOutputToInput[name]
+                        if (inputName != null) {
+                            pastKeyValues[inputName] = value
                         }
                     }
 
                     outputIds = outputIds + nextId
-
                     if (nextId == NllbTokenizer.EOS) break
                 }
 
@@ -99,8 +133,7 @@ class NllbTranslator(
 
                 val decoded = tokenizer.decode(outputIds)
                 if (decoded != null && decoded.isNotBlank()) {
-                    val cleaned = GrammarEngine.clean(decoded)
-                    TranslationResult.Success(cleaned)
+                    TranslationResult.Success(GrammarEngine.clean(decoded))
                 } else {
                     TranslationResult.Error("Decoding produced empty result")
                 }
@@ -109,6 +142,37 @@ class NllbTranslator(
                 TranslationResult.Error(e.message ?: "Unknown error")
             }
         }
+    }
+
+    private fun buildDecInputs(
+        decoderInput: OnnxTensor,
+        encoderOutput: OnnxTensor,
+        inputIds: IntArray,
+        pastKeyValues: Map<String, OnnxValue>
+    ): Map<String, OnnxValue> {
+        val inputs = mutableMapOf<String, OnnxValue>()
+        for (name in decoderInputNames) {
+            inputs[name] = when {
+                name == "input_ids" -> decoderInput
+                name == "encoder_hidden_states" || name == "hidden_states" -> encoderOutput
+                name.contains("attention_mask") -> createAttentionMask(inputIds)
+                pastKeyValues.containsKey(name) -> pastKeyValues[name]!!
+                else -> continue
+            }
+        }
+        return inputs
+    }
+
+    private fun mapName(names: List<String>, vararg candidates: String): String {
+        for (c in candidates) {
+            val exact = names.firstOrNull { it == c }
+            if (exact != null) return exact
+        }
+        for (c in candidates) {
+            val fuzzy = names.firstOrNull { it.contains(c, ignoreCase = true) }
+            if (fuzzy != null) return fuzzy
+        }
+        return names.first()
     }
 
     private fun createAttentionMask(ids: IntArray): OnnxTensor {
