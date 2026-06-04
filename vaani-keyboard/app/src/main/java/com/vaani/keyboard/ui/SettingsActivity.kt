@@ -176,6 +176,12 @@ class SettingsActivity : BaseActivity() {
                 }
             }
 
+            override fun onVerify() {
+                uiScope.launch {
+                    statusText.text = getString(R.string.model_status_verifying)
+                }
+            }
+
             override fun onComplete(success: Boolean, message: String) {
                 uiScope.launch {
                     actionBtn.isEnabled = true
