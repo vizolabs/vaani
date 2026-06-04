@@ -82,13 +82,16 @@ class NllbTranslator(
     fun isLoaded(): Boolean = encoderSession != null && decoderSession != null && tokenizer.isLoaded()
 
     suspend fun translate(input: String): TranslationResult {
+        val tTotal = Timing(TAG, "translate")
         if (!isLoaded()) return TranslationResult.Error("Model not loaded")
         if (input.isBlank()) return TranslationResult.Error("Empty input")
 
         return withContext(Dispatchers.IO) {
             try {
+                val tEncode = Timing(TAG, "tokenizer.encode")
                 val inputIds = tokenizer.encode(input)
                     ?: return@withContext TranslationResult.Error("Tokenization failed")
+                tEncode.log()
 
                 val encInputs = mutableMapOf<String, OnnxTensor>()
                 encInputs[mapName(encoderInputNames, "input_ids")] =
@@ -96,7 +99,9 @@ class NllbTranslator(
                 encInputs[mapName(encoderInputNames, "attention_mask")] =
                     createAttentionMask(inputIds)
 
+                val tEncoder = Timing(TAG, "encoder.run")
                 val encoderResult = encoderSession!!.run(encInputs)
+                tEncoder.log()
                 encInputs.values.forEach { it.close() }
 
                 val encoderHiddenName = mapName(encoderOutputNames, "last_hidden_state")
@@ -104,8 +109,10 @@ class NllbTranslator(
                 var outputIds = intArrayOf(NllbTokenizer.ENGLISH_LANG, NllbTokenizer.BOS)
 
                 val pastKeyValues = mutableMapOf<String, OnnxValue>()
+                val decoderStepTimes = mutableListOf<Long>()
 
                 for (step in 0 until MAX_DECODE_STEPS) {
+                    val tStep = System.nanoTime()
                     val decoderInput = OnnxTensor.createTensor(ortEnv!!, outputIds.last())
                     val decInputs = buildDecInputs(decoderInput, encoderOutput, inputIds, pastKeyValues)
                     val decoderResult = decoderSession!!.run(decInputs)
@@ -124,6 +131,7 @@ class NllbTranslator(
                         }
                     }
 
+                    decoderStepTimes.add((System.nanoTime() - tStep) / 1_000_000)
                     outputIds = outputIds + nextId
                     if (nextId == NllbTokenizer.EOS) break
                 }
@@ -131,7 +139,18 @@ class NllbTranslator(
                 encoderOutput.close()
                 encoderResult.close()
 
+                if (decoderStepTimes.isNotEmpty()) {
+                    val avg = decoderStepTimes.average().toLong()
+                    val min = decoderStepTimes.min()
+                    val max = decoderStepTimes.max()
+                    Log.d(TAG, "Decoder steps=${decoderStepTimes.size} avg=${avg}ms min=${min}ms max=${max}ms")
+                }
+
+                val tDecode = Timing(TAG, "tokenizer.decode")
                 val decoded = tokenizer.decode(outputIds)
+                tDecode.log()
+
+                tTotal.log()
                 if (decoded != null && decoded.isNotBlank()) {
                     TranslationResult.Success(GrammarEngine.clean(decoded))
                 } else {
@@ -141,6 +160,14 @@ class NllbTranslator(
                 Log.e(TAG, "Translation failed: ${e.message}", e)
                 TranslationResult.Error(e.message ?: "Unknown error")
             }
+        }
+    }
+
+    private class Timing(private val tag: String, private val label: String) {
+        private val start = System.nanoTime()
+        fun log() {
+            val elapsed = (System.nanoTime() - start) / 1_000_000
+            Log.d(tag, "TIME [$label] ${elapsed}ms")
         }
     }
 
