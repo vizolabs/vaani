@@ -1275,14 +1275,7 @@ object TranslateEngine {
         Regex("^aap (.+) sakte hain$", RegexOption.IGNORE_CASE) to { m ->
             "You can ${m.groupValues[1]}"
         },
-        // "kya aap {X}" → "Do you {X}"
-        Regex("^kya aap (.+)$", RegexOption.IGNORE_CASE) to { m ->
-            "Do you ${m.groupValues[1]}"
-        },
-        // "kya tum {X}" → "Do you {X}"
-        Regex("^kya tum (.+)$", RegexOption.IGNORE_CASE) to { m ->
-            "Do you ${m.groupValues[1]}"
-        },
+
         // "{X} kahan hai" → "Where is {X}"
         Regex("^(.+) kahan hai$", RegexOption.IGNORE_CASE) to { m ->
             "Where is ${m.groupValues[1]}"
@@ -1578,6 +1571,75 @@ object TranslateEngine {
         // "mujhe nahi malum" → "I don't know"
         Regex("^mujhe nahi malum$", RegexOption.IGNORE_CASE) to { m ->
             "I do not know"
+        },
+
+        // "kya aap {X}" → "Do you {X}" (generic, keep at end)
+        Regex("^kya aap (.+)$", RegexOption.IGNORE_CASE) to { m ->
+            "Do you ${m.groupValues[1]}"
+        },
+        // "kya tum {X}" → "Do you {X}"
+        Regex("^kya tum (.+)$", RegexOption.IGNORE_CASE) to { m ->
+            "Do you ${m.groupValues[1]}"
+        },
+
+        // "kya aapne {X}" → "Did you {X}"
+        Regex("^kya aapne (.+)$", RegexOption.IGNORE_CASE) to { m ->
+            "Did you ${m.groupValues[1]}"
+        },
+        // "kya tumne {X}" → "Did you {X}"
+        Regex("^kya tumne (.+)$", RegexOption.IGNORE_CASE) to { m ->
+            "Did you ${m.groupValues[1]}"
+        },
+
+        // "chalo {X}" → "Let us {X}"
+        Regex("^chalo (.+)$", RegexOption.IGNORE_CASE) to { m ->
+            "Let us ${m.groupValues[1]}"
+        },
+        // "chale {X}" → "Let us {X}"
+        Regex("^chale (.+)$", RegexOption.IGNORE_CASE) to { m ->
+            "Let us ${m.groupValues[1]}"
+        },
+
+        // "{X} ho gaya hai" → "{X} has been done" (present perfect)
+        Regex("^(.+) ho gaya hai$", RegexOption.IGNORE_CASE) to { m ->
+            "${m.groupValues[1]} has been done"
+        },
+
+        // "{X} kar liya" → "I have done {X}"
+        Regex("^(.+) kar liya$", RegexOption.IGNORE_CASE) to { m ->
+            "I have done ${m.groupValues[1]}"
+        },
+        // "{X} kar li" → "I have done {X}"
+        Regex("^(.+) kar li$", RegexOption.IGNORE_CASE) to { m ->
+            "I have done ${m.groupValues[1]}"
+        },
+
+        // "{X} karna hai" → "I have to {X}"
+        Regex("^(.+) karna hai$", RegexOption.IGNORE_CASE) to { m ->
+            "I have to ${m.groupValues[1]}"
+        },
+
+        // "{X} nahi karna" → "I do not want to {X}"
+        Regex("^(.+) nahi karna$", RegexOption.IGNORE_CASE) to { m ->
+            "I do not want to ${m.groupValues[1]}"
+        },
+
+        // "kya aapne {X} liya" → "Did you take {X}"
+        Regex("^kya aapne (.+) liya$", RegexOption.IGNORE_CASE) to { m ->
+            "Did you take ${m.groupValues[1]}"
+        },
+        // "kya aapne {X} kiya" → "Did you do {X}"
+        Regex("^kya aapne (.+) kiya$", RegexOption.IGNORE_CASE) to { m ->
+            "Did you do ${m.groupValues[1]}"
+        },
+
+        // "kya aapne {X} dekha" → "Did you see {X}"
+        Regex("^kya aapne (.+) dekha$", RegexOption.IGNORE_CASE) to { m ->
+            "Did you see ${m.groupValues[1]}"
+        },
+        // "kya aapne {X} suna" → "Did you hear {X}"
+        Regex("^kya aapne (.+) suna$", RegexOption.IGNORE_CASE) to { m ->
+            "Did you hear ${m.groupValues[1]}"
         },
     )
 
