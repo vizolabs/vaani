@@ -24,7 +24,7 @@ class ModelManager(private val callback: Callback) {
         private const val TAG = "ModelManager"
         private const val BUFFER_SIZE = 8192
         private const val HASH_ALGORITHM = "SHA-256"
-        private const val MAX_RETRIES = 3
+        private const val MAX_RETRIES = 4
         private const val BASE_BACKOFF_MS = 2000L
 
         private val BASE = "https://huggingface.co/Xenova/nllb-200-distilled-600M/resolve/main/onnx"
@@ -59,6 +59,7 @@ class ModelManager(private val callback: Callback) {
         )
     }
 
+    @Volatile
     private var cancelled = false
 
     fun cancel() {
@@ -86,7 +87,7 @@ class ModelManager(private val callback: Callback) {
                     updateOverall(completedFiles, totalFiles)
                     continue
                 }
-                target.delete()
+                deleteFile(target)
             }
             val success = downloadWithRetry(file, target, completedFiles, totalFiles)
             if (success) {
@@ -123,7 +124,7 @@ class ModelManager(private val callback: Callback) {
                 downloadFile(file, target, completedFiles, totalFiles)
                 callback.onVerify(file.name)
                 if (!verifyFileHash(target, file.expectedSha256)) {
-                    target.delete()
+                    deleteFile(target)
                     lastError = "SHA256 mismatch"
                     Log.w(TAG, "$lastError for ${file.name}")
                     continue
@@ -132,7 +133,7 @@ class ModelManager(private val callback: Callback) {
             } catch (e: Exception) {
                 lastError = e.message ?: "Unknown error"
                 Log.e(TAG, "Attempt $attempt/$MAX_RETRIES failed for ${file.name}: $lastError")
-                target.delete()
+                deleteFile(target)
             }
         }
         Log.e(TAG, "All $MAX_RETRIES attempts failed for ${file.name}: $lastError")
@@ -164,7 +165,7 @@ class ModelManager(private val callback: Callback) {
 
                 while (input.read(buffer).also { bytesRead = it } != -1) {
                     if (cancelled) {
-                        target.delete()
+                        deleteFile(target)
                         return
                     }
                     fos.write(buffer, 0, bytesRead)
@@ -198,8 +199,7 @@ class ModelManager(private val callback: Callback) {
     fun deleteModels(modelDir: File): Boolean {
         return try {
             for (file in FILES) {
-                val f = File(modelDir, file.name)
-                if (f.exists()) f.delete()
+                deleteFile(File(modelDir, file.name))
             }
             modelDir.delete()
             true
@@ -216,6 +216,12 @@ class ModelManager(private val callback: Callback) {
             if (!verifyFileHash(f, file.expectedSha256)) return false
         }
         return true
+    }
+
+    private fun deleteFile(file: File) {
+        if (file.exists() && !file.delete()) {
+            Log.w(TAG, "Failed to delete ${file.name}")
+        }
     }
 
     private fun verifyFileHash(file: File, expectedHash: String): Boolean {

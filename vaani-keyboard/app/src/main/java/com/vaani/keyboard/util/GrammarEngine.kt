@@ -157,8 +157,13 @@ object GrammarEngine {
         return result
     }
 
+    private val aExceptions = setOf(
+        "university", "unicorn", "universal", "universe", "union", "unit", "united",
+        "uniform", "unique", "unilateral", "useful", "useless", "user", "usual",
+        "euphemism", "euphoria", "eucalyptus", "eulogy", "european", "euro",
+    )
+
     private val articlePatterns = arrayOf(
-        Regex("\\ba\\b\\s+(?=[aeiouAEIOU])") to "an ",
         Regex("\\bthe my\\b", RegexOption.IGNORE_CASE) to "my",
         Regex("\\bthe your\\b", RegexOption.IGNORE_CASE) to "your",
         Regex("\\bthe his\\b", RegexOption.IGNORE_CASE) to "his",
@@ -169,10 +174,15 @@ object GrammarEngine {
 
     private fun fixArticles(text: String): String {
         var result = text
+        result = result.replace(Regex("\\ba\\b\\s+(?=[aeiouAEIOU])")) { match ->
+            val afterSpace = match.value.substringAfter(" ")
+            val nextWord = afterSpace.trim().lowercase().removeSuffix(".")
+            if (nextWord in aExceptions) "a " else "an "
+        }
         for ((regex, replacement) in articlePatterns) {
             result = regex.replace(result, replacement)
         }
-        result = result.replace("a an ", "an ")
+        result = result.replace(Regex("\\ba an\\b", RegexOption.IGNORE_CASE), "an")
         return result
     }
 
@@ -267,7 +277,7 @@ object GrammarEngine {
 
     private fun capitalizeFirst(text: String): String {
         if (text.isEmpty()) return text
-        return text[0].uppercase() + text.substring(1)
+        return text.replaceFirstChar { it.uppercase() }
     }
 
     private val sentenceEnders = setOf('.', '!', '?', ':', ';')

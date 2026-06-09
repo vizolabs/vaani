@@ -48,7 +48,7 @@ object Transliterator {
         // Special conjuncts
         put("ksha", "क्ष"); put("tra", "त्र"); put("gya", "ज्ञ")
         put("shra", "श्र"); put("dnya", "ज्ञ"); put("dwa", "द्व")
-        put("dha", "द्ध"); put("tta", "त्त"); put("hna", "ह्न")
+        put("tta", "त्त"); put("hna", "ह्न")
         put("hya", "ह्य"); put("hva", "ह्व"); put("mna", "म्न")
 
         // Matras (vowel signs after consonant — must not shadow vowel-only keys above)
@@ -123,15 +123,22 @@ object Transliterator {
                                 mk in matraMap
                             }
                         if (matraMatch != null) {
+                            val mk = afterKey.substring(0, matraMatch)
                             result.append(mapped.dropLast(1))
-                            result.append(matraMap[afterKey.substring(0, matraMatch)])
+                            if (mk != "a") {
+                                result.append(matraMap[mk]!!)
+                            }
                             i += len + matraMatch
                             matched = true
                             break
                         }
                     }
                     if (!matched) {
-                        result.append(mapped)
+                        if (mapped.endsWith("्") && i + len >= lower.length) {
+                            result.append(mapped.dropLast(1))
+                        } else {
+                            result.append(mapped)
+                        }
                         i += len
                         matched = true
                         break

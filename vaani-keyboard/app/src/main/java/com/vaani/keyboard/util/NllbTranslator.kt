@@ -72,7 +72,9 @@ class NllbTranslator(
                 if (expectedInput in decoderInputNames) {
                     put(outName, expectedInput)
                 } else {
-                    val match = decoderInputNames.firstOrNull { it.endsWith(suffix) }
+                    val match = decoderInputNames.firstOrNull {
+                        it == expectedInput || it.endsWith(".$suffix")
+                    }
                     if (match != null) put(outName, match)
                 }
             }
@@ -82,25 +84,30 @@ class NllbTranslator(
     fun isLoaded(): Boolean = encoderSession != null && decoderSession != null && tokenizer.isLoaded()
 
     suspend fun translate(input: String): TranslationResult {
-        val tTotal = Timing(TAG, "translate")
-        if (!isLoaded()) return TranslationResult.Error("Model not loaded")
         if (input.isBlank()) return TranslationResult.Error("Empty input")
 
         return withContext(Dispatchers.IO) {
+            if (!isLoaded()) return@withContext TranslationResult.Error("Model not loaded")
+            val tTotal = Timing(TAG, "translate")
+            var encoderResult: OrtSession.Result? = null
+            var prevDecoderResult: OrtSession.Result? = null
             try {
                 val tEncode = Timing(TAG, "tokenizer.encode")
                 val inputIds = tokenizer.encode(input)
                     ?: return@withContext TranslationResult.Error("Tokenization failed")
                 tEncode.log()
 
+                val inputIdsLong = inputIds.map { it.toLong() }.toLongArray()
+                val seqLen = inputIds.size.toLong()
+
                 val encInputs = mutableMapOf<String, OnnxTensor>()
                 encInputs[mapName(encoderInputNames, "input_ids")] =
-                    OnnxTensor.createTensor(ortEnv!!, inputIds)
+                    OnnxTensor.createTensor(ortEnv!!, inputIdsLong, longArrayOf(1L, seqLen))
                 encInputs[mapName(encoderInputNames, "attention_mask")] =
-                    createAttentionMask(inputIds)
+                    createAttentionMask(inputIdsLong)
 
                 val tEncoder = Timing(TAG, "encoder.run")
-                val encoderResult = encoderSession!!.run(encInputs)
+                encoderResult = encoderSession!!.run(encInputs)
                 tEncoder.log()
                 encInputs.values.forEach { it.close() }
 
@@ -113,10 +120,17 @@ class NllbTranslator(
 
                 for (step in 0 until MAX_DECODE_STEPS) {
                     val tStep = System.nanoTime()
-                    val decoderInput = OnnxTensor.createTensor(ortEnv!!, outputIds.last())
-                    val decInputs = buildDecInputs(decoderInput, encoderOutput, inputIds, pastKeyValues)
+                    val decoderInput = OnnxTensor.createTensor(
+                        ortEnv!!,
+                        longArrayOf(outputIds.last().toLong()),
+                        longArrayOf(1L, 1L)
+                    )
+                    val decInputs = buildDecInputs(decoderInput, encoderOutput, inputIdsLong, pastKeyValues)
                     val decoderResult = decoderSession!!.run(decInputs)
                     decoderInput.close()
+
+                    prevDecoderResult?.close()
+                    prevDecoderResult = decoderResult
 
                     val logitsName = mapName(decoderOutputNames, "logits")
                     val logits = decoderResult.get(logitsName) as OnnxTensor
@@ -135,9 +149,6 @@ class NllbTranslator(
                     outputIds = outputIds + nextId
                     if (nextId == NllbTokenizer.EOS) break
                 }
-
-                encoderOutput.close()
-                encoderResult.close()
 
                 if (decoderStepTimes.isNotEmpty()) {
                     val avg = decoderStepTimes.average().toLong()
@@ -159,6 +170,9 @@ class NllbTranslator(
             } catch (e: Exception) {
                 Log.e(TAG, "Translation failed: ${e.message}", e)
                 TranslationResult.Error(e.message ?: "Unknown error")
+            } finally {
+                prevDecoderResult?.close()
+                try { encoderResult?.close() } catch (_: Exception) {}
             }
         }
     }
@@ -174,7 +188,7 @@ class NllbTranslator(
     private fun buildDecInputs(
         decoderInput: OnnxTensor,
         encoderOutput: OnnxTensor,
-        inputIds: IntArray,
+        inputIdsLong: LongArray,
         pastKeyValues: Map<String, OnnxValue>
     ): Map<String, OnnxValue> {
         val inputs = mutableMapOf<String, OnnxValue>()
@@ -182,7 +196,7 @@ class NllbTranslator(
             inputs[name] = when {
                 name == "input_ids" -> decoderInput
                 name == "encoder_hidden_states" || name == "hidden_states" -> encoderOutput
-                name.contains("attention_mask") -> createAttentionMask(inputIds)
+                name.contains("attention_mask") -> createAttentionMask(inputIdsLong)
                 pastKeyValues.containsKey(name) -> pastKeyValues[name]!!
                 else -> continue
             }
@@ -202,9 +216,9 @@ class NllbTranslator(
         return names.first()
     }
 
-    private fun createAttentionMask(ids: IntArray): OnnxTensor {
-        val mask = ids.map { if (it == 0) 0L else 1L }.toLongArray()
-        return OnnxTensor.createTensor(ortEnv!!, mask)
+    private fun createAttentionMask(idsLong: LongArray): OnnxTensor {
+        val mask = idsLong.map { if (it == 0L) 0L else 1L }.toLongArray()
+        return OnnxTensor.createTensor(ortEnv!!, mask, longArrayOf(1L, idsLong.size.toLong()))
     }
 
     private fun argMax(tensor: OnnxTensor): Int {
