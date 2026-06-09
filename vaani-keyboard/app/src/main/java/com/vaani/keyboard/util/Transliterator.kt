@@ -10,6 +10,7 @@ object Transliterator {
         put("e", "ए"); put("E", "ए")
         put("o", "ओ"); put("O", "ओ")
         put("ai", "ऐ"); put("au", "औ")
+        put("ri", "ऋ"); put("r̥", "ऋ"); put("ru", "ॠ")
 
         // Consonants - ka family
         put("ka", "क"); put("kha", "ख"); put("ga", "ग"); put("gha", "घ"); put("nga", "ङ")
@@ -46,7 +47,9 @@ object Transliterator {
 
         // Special conjuncts
         put("ksha", "क्ष"); put("tra", "त्र"); put("gya", "ज्ञ")
-        put("shra", "श्र")
+        put("shra", "श्र"); put("dnya", "ज्ञ"); put("dwa", "द्व")
+        put("dha", "द्ध"); put("tta", "त्त"); put("hna", "ह्न")
+        put("hya", "ह्य"); put("hva", "ह्व"); put("mna", "म्न")
 
         // Matras (vowel signs after consonant — must not shadow vowel-only keys above)
         put("ee", "ी"); put("oo", "ू")
@@ -69,6 +72,15 @@ object Transliterator {
         put("pani", "पानी"); put("kaha", "कहाँ"); put("kab", "कब")
         put("bahut", "बहुत"); put("thoda", "थोड़ा"); put("zyada", "ज़्यादा")
         put("accha", "अच्छा"); put("sundar", "सुंदर")
+        put("kripya", "कृपया"); put("kripaya", "कृपया")
+        put("namaste", "नमस्ते"); put("swagat", "स्वागत")
+        put("dhanyavaad", "धन्यवाद"); put("sukriya", "शुक्रिया")
+        put("prayas", "प्रयास"); put("pranam", "प्रणाम")
+        put("prarthna", "प्रार्थना"); put("sambandh", "सम्बन्ध")
+        put("vidya", "विद्या"); put("vidyalay", "विद्यालय")
+        put("pradhan", "प्रधान"); put("prakash", "प्रकाश")
+        put("sanskrit", "संस्कृत"); put("bharat", "भारत")
+        put("trupti", "तृप्ति"); put("kritagya", "कृतज्ञ")
     }
 
     fun transliterate(input: String): String {
@@ -87,6 +99,7 @@ object Transliterator {
         "e" to "े", "E" to "े",
         "o" to "ो", "O" to "ो",
         "ai" to "ै", "au" to "ौ",
+        "ri" to "ृ", "r̥" to "ृ",
     )
 
     private fun phoneticFallback(input: String): String {
