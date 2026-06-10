@@ -1,5 +1,9 @@
 package com.vaani.keyboard.util
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -11,7 +15,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.security.MessageDigest
 
-class ModelManager(private val callback: Callback) {
+class ModelManager(private val context: Context, private val callback: Callback) {
 
     interface Callback {
         fun onFileProgress(fileName: String, bytesDownloaded: Long, totalBytes: Long, speedKBps: Long)
@@ -26,6 +30,7 @@ class ModelManager(private val callback: Callback) {
         private const val HASH_ALGORITHM = "SHA-256"
         private const val MAX_RETRIES = 4
         private const val BASE_BACKOFF_MS = 2000L
+        private const val MIN_REQUIRED_SPACE = 1_073_741_824L // 1 GB
 
         private val BASE = "https://huggingface.co/Xenova/nllb-200-distilled-600M/resolve/main/onnx"
         private val SPM_BASE = "https://huggingface.co/facebook/nllb-200-distilled-600M/resolve/main"
@@ -69,6 +74,15 @@ class ModelManager(private val callback: Callback) {
     suspend fun downloadAll(modelDir: File) = withContext(Dispatchers.IO) {
         cancelled = false
         modelDir.mkdirs()
+
+        if (!checkNetwork()) {
+            callback.onComplete(false, "No internet connection")
+            return@withContext
+        }
+        if (!hasFreeSpace(modelDir)) {
+            callback.onComplete(false, "Insufficient storage space (need ~1 GB)")
+            return@withContext
+        }
 
         val totalFiles = FILES.size
         var completedFiles = 0
@@ -172,7 +186,7 @@ class ModelManager(private val callback: Callback) {
                     totalBytes += bytesRead
 
                     val elapsed = (System.nanoTime() - startTime) / 1_000_000
-                    val speedKBps = if (elapsed > 0) (totalBytes / elapsed) else 0L
+                    val speedKBps = if (elapsed > 0) (totalBytes * 1000) / (elapsed * 1024) else 0L
 
                     if (contentLength > 0) {
                         val filePercent = ((totalBytes.toFloat() / contentLength.toFloat()) * 100).toInt()
@@ -194,6 +208,22 @@ class ModelManager(private val callback: Callback) {
 
     private fun updateOverall(completed: Int, total: Int) {
         callback.onOverallProgress((completed.toFloat() / total.toFloat() * 100).toInt())
+    }
+
+    private fun checkNetwork(): Boolean {
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        return if (Build.VERSION.SDK_INT >= 23) {
+            val network = cm.activeNetwork ?: return false
+            val caps = cm.getNetworkCapabilities(network) ?: return false
+            caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        } else {
+            @Suppress("DEPRECATION")
+            cm.activeNetworkInfo?.isConnected == true
+        }
+    }
+
+    private fun hasFreeSpace(dir: File): Boolean {
+        return dir.freeSpace >= MIN_REQUIRED_SPACE
     }
 
     fun deleteModels(modelDir: File): Boolean {

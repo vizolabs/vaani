@@ -50,6 +50,7 @@ class NllbTokenizer(private val modelPath: String) {
 
     fun isLoaded(): Boolean = processor != null || fallback != null
 
+    @Synchronized
     fun encode(source: String): IntArray? {
         return try {
             val tokens = if (processor != null) {
@@ -67,6 +68,7 @@ class NllbTokenizer(private val modelPath: String) {
         }
     }
 
+    @Synchronized
     fun decode(tokenIds: IntArray): String? {
         return try {
             val filtered = tokenIds.filter { it !in setOf(BOS, EOS, HINDI_LANG, ENGLISH_LANG, UNK) }.toIntArray()
