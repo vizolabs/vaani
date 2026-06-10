@@ -25,8 +25,11 @@ import com.vaani.keyboard.util.TranslationResult
 import com.vaani.keyboard.util.Transliterator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 class VaaniKeyboardService : InputMethodService() {
@@ -56,6 +59,7 @@ class VaaniKeyboardService : InputMethodService() {
     private var nllbTokenizer: NllbTokenizer? = null
     private var nllbTranslator: NllbTranslator? = null
     private var isAiTranslating = false
+    private var previewAiJob: Job? = null
     private val aiScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     private val letterKeyIds = listOf(
@@ -105,7 +109,12 @@ class VaaniKeyboardService : InputMethodService() {
 
     private fun warmUpTranslator() {
         if (!prefs.modelDownloaded) return
-        aiScope.launch(Dispatchers.IO) {
+        aiScope.launch { retryWarmUp() }
+    }
+
+    private suspend fun retryWarmUp() {
+        for (attempt in 1..3) {
+            if (nllbTranslator?.isLoaded() == true) return
             try {
                 val modelDir = getModelDir()
                 val tokenizerPath = File(modelDir, "sentencepiece.bpe.model").absolutePath
@@ -113,17 +122,19 @@ class VaaniKeyboardService : InputMethodService() {
                 nllbTokenizer = tokenizer
                 if (!tokenizer.isLoaded()) {
                     nllbTokenizer = null
-                    return@launch
+                    if (attempt < 3) { delay(5000); continue } else return
                 }
                 val encoderPath = File(modelDir, "encoder_model_quantized.onnx").absolutePath
                 val decoderPath = File(modelDir, "decoder_with_past_model_quantized.onnx").absolutePath
                 val translator = NllbTranslator(encoderPath, decoderPath, tokenizer)
                 if (translator.load()) {
                     nllbTranslator = translator
+                    return
                 }
             } catch (_: Exception) {
                 nllbTranslator = null
             }
+            if (attempt < 3) delay(5000)
         }
     }
 
@@ -133,6 +144,9 @@ class VaaniKeyboardService : InputMethodService() {
         lastSpaceTime = 0L
         isShifted = false
         isCaps = false
+        if (prefs.modelDownloaded && nllbTranslator == null) {
+            warmUpTranslator()
+        }
     }
 
     override fun onStartInputView(info: EditorInfo?, restarting: Boolean) {
@@ -549,6 +563,7 @@ class VaaniKeyboardService : InputMethodService() {
                     ic.deleteSurroundingText(currentInput.length, 0)
                     ic.commitText(result.text, 1)
                     currentInput.clear()
+                    prefs.incrementTranslationCount()
                 }
                 is TranslationResult.Fallback, is TranslationResult.Error -> {
                     doTranslateFallback(rawText, ic)
@@ -556,7 +571,6 @@ class VaaniKeyboardService : InputMethodService() {
             }
 
             isAiTranslating = false
-            prefs.incrementTranslationCount()
             prefs.markActive()
             updatePreview()
         }
@@ -596,6 +610,7 @@ class VaaniKeyboardService : InputMethodService() {
         speechHelper = null
         nllbTranslator?.close()
         nllbTranslator = null
+        nllbTokenizer = null
     }
 
     private fun updateShiftKeyAppearance() {
@@ -653,5 +668,22 @@ class VaaniKeyboardService : InputMethodService() {
         }
 
         updateSuggestions()
+
+        previewAiJob?.cancel()
+        if (nllbTranslator?.isLoaded() == true && text.isNotBlank()) {
+            val capturedText = text
+            previewAiJob = aiScope.launch {
+                val aiResult = withContext(Dispatchers.IO) {
+                    try { nllbTranslator!!.translate(capturedText) }
+                    catch (_: Exception) { null }
+                }
+                if (currentInput.toString().trim() != capturedText) return@launch
+                if (aiResult is TranslationResult.Success) {
+                    val label = "→ [AI] ${aiResult.text}"
+                    previewEnglish.text = label
+                    if (::previewEnglishSym.isInitialized) previewEnglishSym.text = label
+                }
+            }
+        }
     }
 }
