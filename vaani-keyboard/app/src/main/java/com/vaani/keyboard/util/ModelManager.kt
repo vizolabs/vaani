@@ -96,7 +96,7 @@ class ModelManager(private val context: Context, private val callback: Callback)
             val target = File(modelDir, file.name)
             if (target.exists() && target.length() > 0) {
                 callback.onVerify(file.name)
-                if (verifyFileHash(target, file.expectedSha256)) {
+                if (verifyFileHash(target, file.expectedSha256, file.name)) {
                     completedFiles++
                     updateOverall(completedFiles, totalFiles)
                     continue
@@ -137,12 +137,13 @@ class ModelManager(private val context: Context, private val callback: Callback)
             try {
                 downloadFile(file, target, completedFiles, totalFiles)
                 callback.onVerify(file.name)
-                if (!verifyFileHash(target, file.expectedSha256)) {
+                if (!verifyFileHash(target, file.expectedSha256, file.name)) {
                     deleteFile(target)
                     lastError = "SHA256 mismatch"
                     Log.w(TAG, "$lastError for ${file.name}")
                     continue
                 }
+                persistSha256(target, file.name)
                 return true
             } catch (e: Exception) {
                 lastError = e.message ?: "Unknown error"
@@ -232,6 +233,7 @@ class ModelManager(private val context: Context, private val callback: Callback)
                 deleteFile(File(modelDir, file.name))
             }
             modelDir.delete()
+            clearHashes()
             true
         } catch (e: Exception) {
             Log.e(TAG, "Failed to delete models: ${e.message}")
@@ -243,7 +245,7 @@ class ModelManager(private val context: Context, private val callback: Callback)
         for (file in FILES) {
             val f = File(modelDir, file.name)
             if (!f.exists() || f.length() == 0L) return false
-            if (!verifyFileHash(f, file.expectedSha256)) return false
+            if (!verifyFileHash(f, file.expectedSha256, file.name)) return false
         }
         return true
     }
@@ -254,15 +256,41 @@ class ModelManager(private val context: Context, private val callback: Callback)
         }
     }
 
-    private fun verifyFileHash(file: File, expectedHash: String): Boolean {
-        if (expectedHash.isBlank()) return file.exists() && file.length() > 0
+    private fun verifyFileHash(file: File, expectedHash: String, fileName: String): Boolean {
+        val hash = if (expectedHash.isNotBlank()) expectedHash else getStoredHash(fileName)
+        if (hash.isNullOrBlank()) return file.exists() && file.length() > 0
         return try {
             val actual = sha256(file)
-            actual.equals(expectedHash, ignoreCase = true)
+            actual.equals(hash, ignoreCase = true)
         } catch (e: Exception) {
             Log.w(TAG, "Hash check failed: ${e.message}")
             false
         }
+    }
+
+    private fun persistSha256(file: File, name: String) {
+        try {
+            val hash = sha256(file)
+            context.getSharedPreferences("model_hashes", 0).edit()
+                .putString("sha256_$name", hash)
+                .apply()
+            Log.d(TAG, "Stored SHA256 for $name: $hash")
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to persist SHA256 for $name: ${e.message}")
+        }
+    }
+
+    private fun getStoredHash(name: String): String? {
+        return try {
+            context.getSharedPreferences("model_hashes", 0)
+                .getString("sha256_$name", null)
+        } catch (_: Exception) { null }
+    }
+
+    fun clearHashes() {
+        try {
+            context.getSharedPreferences("model_hashes", 0).edit().clear().apply()
+        } catch (_: Exception) {}
     }
 
     private fun sha256(file: File): String {

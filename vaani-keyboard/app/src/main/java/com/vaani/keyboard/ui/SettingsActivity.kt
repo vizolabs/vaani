@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
+import com.vaani.keyboard.BuildConfig
 import com.vaani.keyboard.R
 import com.vaani.keyboard.util.ModelManager
 import kotlinx.coroutines.CoroutineScope
@@ -31,6 +32,8 @@ class SettingsActivity : BaseActivity() {
         setupHapticToggle()
         setupSoundToggle()
         setupModelSection()
+        findViewById<TextView>(R.id.tv_settings_about)?.text =
+            getString(R.string.settings_about_text, BuildConfig.VERSION_NAME)
     }
 
     private fun setupLanguageButtons() {

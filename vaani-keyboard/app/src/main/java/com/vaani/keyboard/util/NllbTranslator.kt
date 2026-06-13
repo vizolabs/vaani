@@ -6,10 +6,14 @@ import ai.onnxruntime.OrtEnvironment
 import ai.onnxruntime.OrtSession
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
 import java.io.File
+import java.util.concurrent.Callable
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
 class NllbTranslator(
     private val encoderPath: String,
@@ -26,6 +30,11 @@ class NllbTranslator(
     private var decoderOutputNames: List<String> = emptyList()
 
     private var kvOutputToInput: Map<String, String> = emptyMap()
+
+    private val translateMutex = Mutex()
+    private val executor = Executors.newSingleThreadExecutor { r ->
+        Thread(r, "onnx-inference").also { it.isDaemon = true }
+    }
 
     companion object {
         private const val TAG = "NllbTranslator"
@@ -93,101 +102,121 @@ class NllbTranslator(
             return TranslationResult.Error("Input too long (max $MAX_INPUT_CHARS chars)")
         }
 
-        return withContext(Dispatchers.IO) {
-            try {
-                withTimeout(INFERENCE_TIMEOUT_MS) {
-                    if (!isLoaded()) return@withTimeout TranslationResult.Error("Model not loaded")
-                    val tTotal = Timing(TAG, "translate")
-                    var encoderResult: OrtSession.Result? = null
-                    var prevDecoderResult: OrtSession.Result? = null
-                    try {
-                        val tEncode = Timing(TAG, "tokenizer.encode")
-                        val inputIds = tokenizer.encode(input)
-                            ?: return@withTimeout TranslationResult.Error("Tokenization failed")
-                        tEncode.log()
-
-                        val inputIdsLong = inputIds.map { it.toLong() }.toLongArray()
-                        val seqLen = inputIds.size.toLong()
-
-                        val encInputs = mutableMapOf<String, OnnxTensor>()
-                        encInputs[mapName(encoderInputNames, "input_ids")] =
-                            OnnxTensor.createTensor(ortEnv!!, inputIdsLong, longArrayOf(1L, seqLen))
-                        encInputs[mapName(encoderInputNames, "attention_mask")] =
-                            createAttentionMask(inputIdsLong)
-
-                        val tEncoder = Timing(TAG, "encoder.run")
-                        encoderResult = encoderSession!!.run(encInputs)
-                        tEncoder.log()
-                        encInputs.values.forEach { it.close() }
-
-                        val encoderHiddenName = mapName(encoderOutputNames, "last_hidden_state")
-                        val encoderOutput = encoderResult.get(encoderHiddenName) as OnnxTensor
-                        var outputIds = intArrayOf(NllbTokenizer.ENGLISH_LANG, NllbTokenizer.BOS)
-
-                        val pastKeyValues = mutableMapOf<String, OnnxValue>()
-                        val decoderStepTimes = mutableListOf<Long>()
-
-                        for (step in 0 until MAX_DECODE_STEPS) {
-                            val tStep = System.nanoTime()
-                            val decoderInput = OnnxTensor.createTensor(
-                                ortEnv!!,
-                                longArrayOf(outputIds.last().toLong()),
-                                longArrayOf(1L, 1L)
-                            )
-                            val decInputs = buildDecInputs(decoderInput, encoderOutput, inputIdsLong, pastKeyValues)
-                            val decoderResult = decoderSession!!.run(decInputs)
-                            decoderInput.close()
-
-                            prevDecoderResult?.close()
-                            prevDecoderResult = decoderResult
-
-                            val logitsName = mapName(decoderOutputNames, "logits")
-                            val logits = decoderResult.get(logitsName) as OnnxTensor
-                            val nextId = argMax(logits)
-
-                            pastKeyValues.clear()
-                            for ((name, value) in decoderResult) {
-                                val inputName = kvOutputToInput[name]
-                                if (inputName != null) {
-                                    pastKeyValues[inputName] = value
-                                }
-                            }
-
-                            decoderStepTimes.add((System.nanoTime() - tStep) / 1_000_000)
-                            outputIds = outputIds + nextId
-                            if (nextId == NllbTokenizer.EOS) break
-                        }
-
-                        if (decoderStepTimes.isNotEmpty()) {
-                            val avg = decoderStepTimes.average().toLong()
-                            val min = decoderStepTimes.min()
-                            val max = decoderStepTimes.max()
-                            Log.d(TAG, "Decoder steps=${decoderStepTimes.size} avg=${avg}ms min=${min}ms max=${max}ms")
-                        }
-
-                        val tDecode = Timing(TAG, "tokenizer.decode")
-                        val decoded = tokenizer.decode(outputIds)
-                        tDecode.log()
-
-                        tTotal.log()
-                        if (decoded != null && decoded.isNotBlank()) {
-                            TranslationResult.Success(GrammarEngine.clean(decoded))
-                        } else {
-                            TranslationResult.Error("Decoding produced empty result")
-                        }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "Translation failed: ${e.message}", e)
-                        TranslationResult.Error(e.message ?: "Unknown error")
-                    } finally {
-                        prevDecoderResult?.close()
-                        try { encoderResult?.close() } catch (_: Exception) {}
-                    }
+        return translateMutex.withLock {
+            withContext(Dispatchers.IO) {
+                val future = executor.submit(Callable<TranslationResult> {
+                    runTranslation(input)
+                })
+                try {
+                    future.get(INFERENCE_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+                } catch (e: TimeoutException) {
+                    future.cancel(true)
+                    closeSessions()
+                    Log.e(TAG, "Inference timed out after ${INFERENCE_TIMEOUT_MS}ms")
+                    TranslationResult.Error("Inference timed out")
                 }
-            } catch (e: TimeoutCancellationException) {
-                Log.e(TAG, "Inference timed out after ${INFERENCE_TIMEOUT_MS}ms")
-                TranslationResult.Error("Inference timed out")
             }
         }
+    }
+
+    private fun runTranslation(input: String): TranslationResult {
+        if (!isLoaded()) return TranslationResult.Error("Model not loaded")
+        val tTotal = Timing(TAG, "translate")
+        var encoderResult: OrtSession.Result? = null
+        var prevDecoderResult: OrtSession.Result? = null
+        try {
+            val tEncode = Timing(TAG, "tokenizer.encode")
+            val inputIds = tokenizer.encode(input)
+                ?: return TranslationResult.Error("Tokenization failed")
+            tEncode.log()
+
+            val inputIdsLong = inputIds.map { it.toLong() }.toLongArray()
+            val seqLen = inputIds.size.toLong()
+
+            val encInputs = mutableMapOf<String, OnnxTensor>()
+            encInputs[mapName(encoderInputNames, "input_ids")] =
+                OnnxTensor.createTensor(ortEnv!!, inputIdsLong, longArrayOf(1L, seqLen))
+            encInputs[mapName(encoderInputNames, "attention_mask")] =
+                createAttentionMask(inputIdsLong)
+
+            val tEncoder = Timing(TAG, "encoder.run")
+            encoderResult = encoderSession!!.run(encInputs)
+            tEncoder.log()
+            encInputs.values.forEach { it.close() }
+
+            val encoderHiddenName = mapName(encoderOutputNames, "last_hidden_state")
+            val encoderOutput = encoderResult.get(encoderHiddenName) as OnnxTensor
+            var outputIds = intArrayOf(NllbTokenizer.ENGLISH_LANG, NllbTokenizer.BOS)
+
+            val pastKeyValues = mutableMapOf<String, OnnxValue>()
+            val decoderStepTimes = mutableListOf<Long>()
+
+            for (step in 0 until MAX_DECODE_STEPS) {
+                val tStep = System.nanoTime()
+                val decoderInput = OnnxTensor.createTensor(
+                    ortEnv!!,
+                    longArrayOf(outputIds.last().toLong()),
+                    longArrayOf(1L, 1L)
+                )
+                val decInputs = buildDecInputs(decoderInput, encoderOutput, inputIdsLong, pastKeyValues)
+                val decoderResult = decoderSession!!.run(decInputs)
+                decoderInput.close()
+
+                prevDecoderResult?.close()
+                prevDecoderResult = decoderResult
+
+                val logitsName = mapName(decoderOutputNames, "logits")
+                val logits = decoderResult.get(logitsName) as OnnxTensor
+                val nextId = argMax(logits)
+
+                pastKeyValues.clear()
+                for ((name, value) in decoderResult) {
+                    val inputName = kvOutputToInput[name]
+                    if (inputName != null) {
+                        pastKeyValues[inputName] = value
+                    }
+                }
+
+                decoderStepTimes.add((System.nanoTime() - tStep) / 1_000_000)
+                outputIds = outputIds + nextId
+                if (nextId == NllbTokenizer.EOS) break
+            }
+
+            if (decoderStepTimes.isNotEmpty()) {
+                val avg = decoderStepTimes.average().toLong()
+                val min = decoderStepTimes.min()
+                val max = decoderStepTimes.max()
+                Log.d(TAG, "Decoder steps=${decoderStepTimes.size} avg=${avg}ms min=${min}ms max=${max}ms")
+            }
+
+            val tDecode = Timing(TAG, "tokenizer.decode")
+            val decoded = tokenizer.decode(outputIds)
+            tDecode.log()
+
+            tTotal.log()
+            if (decoded != null && decoded.isNotBlank()) {
+                TranslationResult.Success(GrammarEngine.clean(decoded))
+            } else {
+                TranslationResult.Error("Decoding produced empty result")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Translation failed: ${e.message}", e)
+            TranslationResult.Error(e.message ?: "Unknown error")
+        } finally {
+            prevDecoderResult?.close()
+            try { encoderResult?.close() } catch (_: Exception) {}
+        }
+    }
+
+    private fun closeSessions() {
+        try {
+            encoderSession?.close()
+        } catch (_: Exception) {}
+        try {
+            decoderSession?.close()
+        } catch (_: Exception) {}
+        encoderSession = null
+        decoderSession = null
     }
 
     private class Timing(private val tag: String, private val label: String) {
@@ -250,6 +279,7 @@ class NllbTranslator(
 
     fun close() {
         try {
+            executor.shutdownNow()
             encoderSession?.close()
             decoderSession?.close()
         } catch (_: Exception) {}

@@ -1,5 +1,6 @@
 package com.vaani.keyboard.util
 
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -74,7 +75,7 @@ class NllbTranslatorTest {
     }
 
     @Test
-    fun `translator loads and translates simple input`() {
+    fun `translator loads and translates simple input`() = runTest {
         val tokenizer = NllbTokenizer(tokenizerFile.absolutePath)
         assumeTrue("Tokenizer must load for this test", tokenizer.isLoaded())
 
@@ -83,10 +84,10 @@ class NllbTranslatorTest {
             decoderFile.absolutePath,
             tokenizer
         )
-        val loaded = runBlockingTest { translator.load() }
+        val loaded = translator.load()
         assertTrue("Translator should load", loaded)
 
-        val result = runBlockingTest { translator.translate("namaste") }
+        val result = translator.translate("namaste")
         assertTrue(
             "Translation should succeed: $result",
             result is TranslationResult.Success
@@ -101,7 +102,7 @@ class NllbTranslatorTest {
     }
 
     @Test
-    fun `translator handles unknown gracefully`() {
+    fun `translator handles unknown gracefully`() = runTest {
         val tokenizer = NllbTokenizer(tokenizerFile.absolutePath)
         assumeTrue("Tokenizer must load for this test", tokenizer.isLoaded())
 
@@ -110,14 +111,10 @@ class NllbTranslatorTest {
             decoderFile.absolutePath,
             tokenizer
         )
-        val loaded = runBlockingTest { translator.load() }
+        val loaded = translator.load()
         assumeTrue("Translator must load for this test", loaded)
 
-        val result = runBlockingTest { translator.translate("") }
+        val result = translator.translate("")
         assertTrue("Empty input should return Error", result is TranslationResult.Error)
     }
-}
-
-private fun <T> runBlockingTest(block: suspend () -> T): T {
-    return kotlinx.coroutines.runBlocking { block() }
 }

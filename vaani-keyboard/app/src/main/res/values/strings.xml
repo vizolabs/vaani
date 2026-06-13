@@ -40,7 +40,7 @@
     <string name="settings_sound_label">Sound on keypress</string>
     <string name="settings_language_label">Input Language</string>
     <string name="settings_about_label">About Vaani</string>
-    <string name="settings_about_text">Vaani converts your native language text and voice into grammatically correct English. Everything runs entirely on your device — no internet needed, no data leaves your phone.\n\nVersion 1.0.0</string>
+    <string name="settings_about_text">Vaani converts your native language text and voice into grammatically correct English. Everything runs entirely on your device — no internet needed, no data leaves your phone.\n\nVersion %s</string>
     <string name="settings_lang_saved">Language saved</string>
 
     <!-- Onboarding Step 3: Switch Default Keyboard -->
