@@ -15,7 +15,7 @@ android {
         versionName = "1.0.0"
 
         ndk {
-            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
         }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -55,7 +55,4 @@ dependencies {
 
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.junit)
-
-    androidTestImplementation(libs.androidx.test.ext.junit)
-    androidTestImplementation(libs.androidx.test.espresso.core)
 }

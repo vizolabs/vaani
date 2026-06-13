@@ -26,28 +26,41 @@ class DashboardActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)
 
+        findViewById<TextView>(R.id.tv_settings_link).setOnClickListener {
+            Navigator.toSettings(this)
+        }
+        findViewById<TextView>(R.id.tv_mic_status).setOnClickListener {
+            requestMicrophonePermission()
+        }
+
+        refreshUi()
+        setupModelSection()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        refreshUi()
+    }
+
+    private fun refreshUi() {
         val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         val greeting = when {
             hour < 12 -> getString(R.string.greeting_morning)
             hour < 17 -> getString(R.string.greeting_afternoon)
             else -> getString(R.string.greeting_evening)
         }
+        findViewById<TextView>(R.id.tv_greeting).text = greeting
 
         val langLabel = when (prefs.selectedLanguage) {
             "hi" -> getString(R.string.subtype_hindi)
             "mr" -> getString(R.string.subtype_marathi)
             else -> getString(R.string.subtype_hinglish)
         }
-
-        findViewById<TextView>(R.id.tv_greeting).text = greeting
         findViewById<TextView>(R.id.tv_status).text =
             getString(R.string.dashboard_ready, langLabel)
 
         val micStatus = findViewById<TextView>(R.id.tv_mic_status)
         updateMicStatus(micStatus)
-        micStatus.setOnClickListener {
-            requestMicrophonePermission()
-        }
 
         val translationCount = findViewById<TextView>(R.id.tv_translation_count)
         val count = prefs.translationCount
@@ -56,12 +69,6 @@ class DashboardActivity : BaseActivity() {
         } else {
             getString(R.string.dashboard_translations_none)
         }
-
-        findViewById<TextView>(R.id.tv_settings_link).setOnClickListener {
-            Navigator.toSettings(this)
-        }
-
-        setupModelSection()
     }
 
     private fun setupModelSection() {
@@ -129,7 +136,7 @@ class DashboardActivity : BaseActivity() {
         statusText.text = getString(R.string.model_status_downloading, 0)
 
         val modelDir = File(filesDir, "models")
-        modelManager = ModelManager(object : ModelManager.Callback {
+        modelManager = ModelManager(this, object : ModelManager.Callback {
             override fun onFileProgress(fileName: String, bytesDownloaded: Long, totalBytes: Long, speedKBps: Long) {
                 uiScope.launch {
                     val speed = if (speedKBps > 1024) "${speedKBps / 1024} MB/s" else "${speedKBps} KB/s"
@@ -157,7 +164,8 @@ class DashboardActivity : BaseActivity() {
                     if (success) {
                         prefs.modelDownloaded = true
                         prefs.modelDownloadProgress = 100
-                        statusText.text = getString(R.string.model_status_ready)
+                        prefs.modelVersion = prefs.modelVersion + 1
+                        statusText.text = getString(R.string.model_download_success)
                         statusText.setTextColor(getColorAccent())
                         actionBtn.text = getString(R.string.model_delete_button)
                         progressBar.visibility = android.view.View.GONE

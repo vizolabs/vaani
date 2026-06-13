@@ -1,5 +1,9 @@
 package com.vaani.keyboard.util
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -11,7 +15,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.security.MessageDigest
 
-class ModelManager(private val callback: Callback) {
+class ModelManager(private val context: Context, private val callback: Callback) {
 
     interface Callback {
         fun onFileProgress(fileName: String, bytesDownloaded: Long, totalBytes: Long, speedKBps: Long)
@@ -26,6 +30,7 @@ class ModelManager(private val callback: Callback) {
         private const val HASH_ALGORITHM = "SHA-256"
         private const val MAX_RETRIES = 4
         private const val BASE_BACKOFF_MS = 2000L
+        private const val MIN_REQUIRED_SPACE = 1_073_741_824L // 1 GB
 
         private val BASE = "https://huggingface.co/Xenova/nllb-200-distilled-600M/resolve/main/onnx"
         private val SPM_BASE = "https://huggingface.co/facebook/nllb-200-distilled-600M/resolve/main"
@@ -70,6 +75,15 @@ class ModelManager(private val callback: Callback) {
         cancelled = false
         modelDir.mkdirs()
 
+        if (!checkNetwork()) {
+            callback.onComplete(false, "No internet connection")
+            return@withContext
+        }
+        if (!hasFreeSpace(modelDir)) {
+            callback.onComplete(false, "Insufficient storage space (need ~1 GB)")
+            return@withContext
+        }
+
         val totalFiles = FILES.size
         var completedFiles = 0
         val failedFiles = mutableListOf<ModelFile>()
@@ -82,7 +96,7 @@ class ModelManager(private val callback: Callback) {
             val target = File(modelDir, file.name)
             if (target.exists() && target.length() > 0) {
                 callback.onVerify(file.name)
-                if (verifyFileHash(target, file.expectedSha256)) {
+                if (verifyFileHash(target, file.expectedSha256, file.name)) {
                     completedFiles++
                     updateOverall(completedFiles, totalFiles)
                     continue
@@ -123,12 +137,13 @@ class ModelManager(private val callback: Callback) {
             try {
                 downloadFile(file, target, completedFiles, totalFiles)
                 callback.onVerify(file.name)
-                if (!verifyFileHash(target, file.expectedSha256)) {
+                if (!verifyFileHash(target, file.expectedSha256, file.name)) {
                     deleteFile(target)
                     lastError = "SHA256 mismatch"
                     Log.w(TAG, "$lastError for ${file.name}")
                     continue
                 }
+                persistSha256(target, file.name)
                 return true
             } catch (e: Exception) {
                 lastError = e.message ?: "Unknown error"
@@ -172,7 +187,7 @@ class ModelManager(private val callback: Callback) {
                     totalBytes += bytesRead
 
                     val elapsed = (System.nanoTime() - startTime) / 1_000_000
-                    val speedKBps = if (elapsed > 0) (totalBytes / elapsed) else 0L
+                    val speedKBps = if (elapsed > 0) (totalBytes * 1000) / (elapsed * 1024) else 0L
 
                     if (contentLength > 0) {
                         val filePercent = ((totalBytes.toFloat() / contentLength.toFloat()) * 100).toInt()
@@ -196,12 +211,29 @@ class ModelManager(private val callback: Callback) {
         callback.onOverallProgress((completed.toFloat() / total.toFloat() * 100).toInt())
     }
 
+    private fun checkNetwork(): Boolean {
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        return if (Build.VERSION.SDK_INT >= 23) {
+            val network = cm.activeNetwork ?: return false
+            val caps = cm.getNetworkCapabilities(network) ?: return false
+            caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        } else {
+            @Suppress("DEPRECATION")
+            cm.activeNetworkInfo?.isConnected == true
+        }
+    }
+
+    private fun hasFreeSpace(dir: File): Boolean {
+        return dir.freeSpace >= MIN_REQUIRED_SPACE
+    }
+
     fun deleteModels(modelDir: File): Boolean {
         return try {
             for (file in FILES) {
                 deleteFile(File(modelDir, file.name))
             }
             modelDir.delete()
+            clearHashes()
             true
         } catch (e: Exception) {
             Log.e(TAG, "Failed to delete models: ${e.message}")
@@ -213,7 +245,7 @@ class ModelManager(private val callback: Callback) {
         for (file in FILES) {
             val f = File(modelDir, file.name)
             if (!f.exists() || f.length() == 0L) return false
-            if (!verifyFileHash(f, file.expectedSha256)) return false
+            if (!verifyFileHash(f, file.expectedSha256, file.name)) return false
         }
         return true
     }
@@ -224,15 +256,41 @@ class ModelManager(private val callback: Callback) {
         }
     }
 
-    private fun verifyFileHash(file: File, expectedHash: String): Boolean {
-        if (expectedHash.isBlank()) return file.exists() && file.length() > 0
+    private fun verifyFileHash(file: File, expectedHash: String, fileName: String): Boolean {
+        val hash = if (expectedHash.isNotBlank()) expectedHash else getStoredHash(fileName)
+        if (hash.isNullOrBlank()) return file.exists() && file.length() > 0
         return try {
             val actual = sha256(file)
-            actual.equals(expectedHash, ignoreCase = true)
+            actual.equals(hash, ignoreCase = true)
         } catch (e: Exception) {
             Log.w(TAG, "Hash check failed: ${e.message}")
             false
         }
+    }
+
+    private fun persistSha256(file: File, name: String) {
+        try {
+            val hash = sha256(file)
+            context.getSharedPreferences("model_hashes", 0).edit()
+                .putString("sha256_$name", hash)
+                .apply()
+            Log.d(TAG, "Stored SHA256 for $name: $hash")
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to persist SHA256 for $name: ${e.message}")
+        }
+    }
+
+    private fun getStoredHash(name: String): String? {
+        return try {
+            context.getSharedPreferences("model_hashes", 0)
+                .getString("sha256_$name", null)
+        } catch (_: Exception) { null }
+    }
+
+    fun clearHashes() {
+        try {
+            context.getSharedPreferences("model_hashes", 0).edit().clear().apply()
+        } catch (_: Exception) {}
     }
 
     private fun sha256(file: File): String {

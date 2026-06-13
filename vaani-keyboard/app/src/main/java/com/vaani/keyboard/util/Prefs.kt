@@ -53,6 +53,10 @@ class Prefs(context: Context) {
         get() = prefs.getInt(KEY_MODEL_DOWNLOAD_PROGRESS, 0)
         set(value) = prefs.edit { putInt(KEY_MODEL_DOWNLOAD_PROGRESS, value) }
 
+    var modelVersion: Int
+        get() = prefs.getInt(KEY_MODEL_VERSION, 0)
+        set(value) = prefs.edit { putInt(KEY_MODEL_VERSION, value) }
+
     fun clear() {
         prefs.edit { clear() }
     }
@@ -67,5 +71,6 @@ class Prefs(context: Context) {
         private const val KEY_SOUND = "key_sound"
         private const val KEY_MODEL_DOWNLOADED = "model_downloaded"
         private const val KEY_MODEL_DOWNLOAD_PROGRESS = "model_download_progress"
+        private const val KEY_MODEL_VERSION = "model_version"
     }
 }

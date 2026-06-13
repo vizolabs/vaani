@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
+import com.vaani.keyboard.BuildConfig
 import com.vaani.keyboard.R
 import com.vaani.keyboard.util.ModelManager
 import kotlinx.coroutines.CoroutineScope
@@ -31,6 +32,8 @@ class SettingsActivity : BaseActivity() {
         setupHapticToggle()
         setupSoundToggle()
         setupModelSection()
+        findViewById<TextView>(R.id.tv_settings_about)?.text =
+            getString(R.string.settings_about_text, BuildConfig.VERSION_NAME)
     }
 
     private fun setupLanguageButtons() {
@@ -167,7 +170,7 @@ class SettingsActivity : BaseActivity() {
         statusText.text = getString(R.string.model_status_downloading, 0)
 
         val modelDir = File(filesDir, "models")
-        modelManager = ModelManager(object : ModelManager.Callback {
+        modelManager = ModelManager(this, object : ModelManager.Callback {
             override fun onFileProgress(fileName: String, bytesDownloaded: Long, totalBytes: Long, speedKBps: Long) {
                 uiScope.launch {
                     val speed = if (speedKBps > 1024) "${speedKBps / 1024} MB/s" else "${speedKBps} KB/s"
@@ -195,7 +198,8 @@ class SettingsActivity : BaseActivity() {
                     if (success) {
                         prefs.modelDownloaded = true
                         prefs.modelDownloadProgress = 100
-                        statusText.text = getString(R.string.model_status_ready)
+                        prefs.modelVersion = prefs.modelVersion + 1
+                        statusText.text = getString(R.string.model_download_success)
                         statusText.setTextColor(getColorAccent())
                         actionBtn.text = getString(R.string.model_delete_button)
                         progressBar.visibility = android.view.View.GONE
